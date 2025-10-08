@@ -9,7 +9,7 @@ const Hero = () => {
                     {/* Left: Content */}
                     <div className="md:w-1/2 w-full mb-8 md:mb-0">
                         <h1 className="text-white text-6xl md:text-5xl font-bold mb-9">
-                            Smart Attendance System for Rural Schools
+                            Smart Attendance System for Rural School
                         </h1>
                         <p className="text-white text-2xl">
                             Empowering schools with automated, reliable attendance tracking.
