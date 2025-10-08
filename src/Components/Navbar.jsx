@@ -43,7 +43,7 @@ const Navbar = () => {
                     <div className="md:hidden px-2 pt-2 pb-3 space-y-1 bg-[#003060]">
                         <a href="/" className="block text-white px-3 py-2 rounded-md text-base font-medium hover:bg-blue-700">Home</a>
                         <a href="/about" className="block text-white px-3 py-2 rounded-md text-base font-medium hover:bg-blue-700">About</a>
-                        <a href="/attendance" className="block text-white px-3 py-2 rounded-md text-base font-medium bg-[#0e86d4] hover:bg-blue-700">Verify Identity</a>
+                        <a href="/attendance" className="block text-white px-3 py-2 rounded-md text-base font-medium bg-[#0e86d4] hover:bg-blue-700">Login/Registration</a>
                     </div>
                 )}
             </nav>
