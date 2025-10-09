@@ -48,11 +48,11 @@ const Contact = () => {
 	};
 
 	return (
-		<div className="bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-400 min-h-screen flex items-center justify-center px-6 py-16">
+		<div className="bg-gradient-to-br from-blue-800 to-cyan-200 min-h-[70vh] flex items-center justify-center py-16">
 			<div className="bg-white/10 backdrop-blur-md shadow-2xl rounded-2xl w-full max-w-6xl flex flex-col md:flex-row overflow-hidden">
 				{/* Left Section */}
 				<div className="md:w-1/2 p-10 text-white">
-					<h1 className="text-4xl font-bold mb-6 border-b-2 border-cyan-400 inline-block pb-2">
+					<h1 className="text-4xl font-bold mb-6 border-b-2 border-cyan-200 inline-block pb-2">
 						Get In Touch
 					</h1>
 					<p className="text-gray-100 mb-6 leading-relaxed">
@@ -206,7 +206,7 @@ const Contact = () => {
 
 					<button
 						type="submit"
-						className="mt-6 w-full bg-blue-700 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-800 transition-all duration-300 shadow-md hover:shadow-lg"
+						className="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg text-lg font-semibold hover:bg-blue-600 transition-all duration-300 shadow-md hover:shadow-lg"
 					>
 						SUBMIT ➤
 					</button>
