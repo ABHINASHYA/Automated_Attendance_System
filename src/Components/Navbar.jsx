@@ -11,7 +11,7 @@ const Navbar = () => {
                     <div className="flex items-center justify-between h-16">
                         <div className="flex items-center">
                             <span className="text-blue-800 font-bold text-2xl hover:cursor-pointer">
-                                Attendance System
+                                <a href="/">Attendance System</a>
                             </span>
                         </div>
 
@@ -52,7 +52,7 @@ const Navbar = () => {
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link to="/register" className="text-white px-3 py-2 rounded-md text-18 font-medium bg-[#0e86d4] hover:bg-blue-700">
+                                    <Link to="/login" className="text-white px-3 py-2 rounded-md text-18 font-medium bg-[#0e86d4] hover:bg-blue-700">
                                         Login/Registration
                                     </Link>
                                 </li>

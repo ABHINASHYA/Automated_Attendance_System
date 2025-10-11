@@ -5,6 +5,7 @@ import Hero from './Components/Hero'
 import About from './Components/About'
 import Contect from './Components/Contect'
 import Register from './Components/Register'
+import Login from './Components/Login'
 import React from 'react'
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contect />} />
         <Route path="/Register" element={<Register />} />
+        <Route path="/Login" element={<Login />} />
       </Routes>
     </Router>
   )
