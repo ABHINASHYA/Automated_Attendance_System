@@ -4,6 +4,7 @@ import Navbar from './Components/Navbar'
 import Hero from './Components/Hero'
 import About from './Components/About'
 import Contect from './Components/Contect'
+import Register from './Components/Register'
 import React from 'react'
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route path="/" element={<Hero />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contect />} />
+        <Route path="/Register" element={<Register />} />
       </Routes>
     </Router>
   )
