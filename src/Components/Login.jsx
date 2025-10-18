@@ -1,7 +1,16 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
+  const navigate = useNavigate();
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    // ✅ You can add authentication logic here later
+    navigate("/AttendancePage"); // redirect to AttendancePage
+  };
+
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-800 to-cyan-200 relative overflow-hidden">
       {/* Animated Background Circles */}
@@ -36,6 +45,7 @@ const Login = () => {
 
         {/* Login Form */}
         <motion.form
+          onSubmit={handleLogin}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.6 }}
@@ -53,6 +63,7 @@ const Login = () => {
           />
 
           <motion.button
+            type="submit"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="mt-2 py-3 bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold rounded-lg shadow-lg hover:shadow-cyan-500/50 transition"
