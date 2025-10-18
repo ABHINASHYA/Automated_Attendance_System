@@ -6,7 +6,9 @@ import About from './Components/About'
 import Contect from './Components/Contect'
 import Register from './Components/Register'
 import Login from './Components/Login'
+import AttendancePage from './Components/AttendancePage'
 import React from 'react'
+
 
 function App() {
   const [count, setCount] = useState(0)
@@ -20,6 +22,7 @@ function App() {
         <Route path="/contact" element={<Contect />} />
         <Route path="/Register" element={<Register />} />
         <Route path="/Login" element={<Login />} />
+        <Route path="/AttendancePage" element={<AttendancePage />} />
       </Routes>
     </Router>
   )
