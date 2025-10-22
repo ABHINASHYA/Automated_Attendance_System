@@ -1,17 +1,17 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from 'react'
 import Navbar from './Components/Navbar'
-import Hero from './Components/Hero'
-import About from './Components/About'
-import Contect from './Components/Contect'
-import Register from './Components/Register'
-import Login from './Components/Login'
-import AttendancePage from './Components/AttendancePage'
+import Hero from './Pages/Hero'
+import About from './Pages/About'
+import Contect from './Pages/Contect'
+import Register from './Pages/Register'
+import Login from './Pages/Login'
+import AttendancePage from './Pages/AttendancePage'
+import AddStudent from './Pages/AddStudent'
 import React from 'react'
 
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <Router>
@@ -23,6 +23,7 @@ function App() {
         <Route path="/Register" element={<Register />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/AttendancePage" element={<AttendancePage />} />
+        <Route path="/AddStudent" element={<AddStudent />} />
       </Routes>
     </Router>
   )
