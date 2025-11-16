@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useState } from 'react'
+import React from 'react';
 import Navbar from './Components/Navbar'
 import Hero from './Pages/Hero'
 import About from './Pages/About'
@@ -8,8 +8,7 @@ import Register from './Pages/Register'
 import Login from './Pages/Login'
 import AttendancePage from './Pages/AttendancePage'
 import AddStudent from './Pages/AddStudent'
-import React from 'react'
-
+import FaceScanner from './Pages/FaceScanner'
 
 function App() {
 
@@ -22,6 +21,8 @@ function App() {
         <Route path="/contact" element={<Contect />} />
         <Route path="/Register" element={<Register />} />
         <Route path="/Login" element={<Login />} />
+        <Route path="/FaceScanner" element={<FaceScanner />} />
+
         <Route path="/AttendancePage" element={<AttendancePage />} />
         <Route path="/AddStudent" element={<AddStudent />} />
       </Routes>

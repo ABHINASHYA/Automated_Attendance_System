@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
+import FaceScanner from "./FaceScanner";
 
 const AttendancePage = () => {
 	const [showForm, setShowForm] = useState(false);
 	const [classList, setClassList] = useState([]);
+	const [scannerOpen, setScannerOpen] = useState(false);
+
 	const [formData, setFormData] = useState({
 		className: "",
 		section: "",
 		subject: "",
 	});
+
 	const [schoolName, setSchoolName] = useState("");
 
-	// Simulated API call (replace later with real one)
+	// Mock API call
 	useEffect(() => {
 		fetch("/mockData/teacher.json")
 			.then((res) => res.json())
@@ -25,6 +29,7 @@ const AttendancePage = () => {
 	const handleSubmit = (e) => {
 		e.preventDefault();
 		if (!formData.className || !formData.section || !formData.subject) return;
+
 		setClassList([...classList, formData]);
 		setFormData({ className: "", section: "", subject: "" });
 		setShowForm(false);
@@ -32,21 +37,21 @@ const AttendancePage = () => {
 
 	return (
 		<div className="min-h-screen bg-gradient-to-br from-blue-800 to-cyan-200 flex flex-col items-center py-10 px-4">
-			{/* Top Section - School Name */}
+			{/* School Name */}
 			<div className="w-full flex justify-start items-center mb-10">
 				<h1 className="text-xl md:text-2xl font-semibold text-white px-6 py-3 rounded-lg shadow-md">
 					{schoolName || "Loading..."}
 				</h1>
 			</div>
 
-			{/* If no class created yet */}
+			{/* Empty State */}
 			{!showForm && classList.length === 0 && (
 				<div className="flex flex-col items-center mt-20 text-center">
 					<h2 className="text-4xl md:text-5xl font-semibold text-[#89ff9b] mb-4">
 						Automated Attendance System
 					</h2>
 					<p className="text-white text-lg mb-8">
-						Making attendance faster and smoother using AI-based face detection.
+						Making attendance faster using AI-based face detection.
 					</p>
 					<button
 						onClick={() => setShowForm(true)}
@@ -63,6 +68,7 @@ const AttendancePage = () => {
 					<h3 className="text-center text-2xl font-semibold mb-6 text-gray-700">
 						Class Details
 					</h3>
+
 					<form onSubmit={handleSubmit} className="flex flex-col gap-4">
 						<input
 							type="text"
@@ -70,7 +76,7 @@ const AttendancePage = () => {
 							value={formData.className}
 							onChange={handleChange}
 							placeholder="Class"
-							className="border-2 border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+							className="border-2 border-gray-400 rounded-lg px-4 py-2"
 						/>
 						<input
 							type="text"
@@ -78,7 +84,7 @@ const AttendancePage = () => {
 							value={formData.section}
 							onChange={handleChange}
 							placeholder="Section"
-							className="border-2 border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+							className="border-2 border-gray-400 rounded-lg px-4 py-2"
 						/>
 						<input
 							type="text"
@@ -86,8 +92,9 @@ const AttendancePage = () => {
 							value={formData.subject}
 							onChange={handleChange}
 							placeholder="Subject"
-							className="border-2 border-gray-400 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+							className="border-2 border-gray-400 rounded-lg px-4 py-2"
 						/>
+
 						<button
 							type="submit"
 							className="mt-4 bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
@@ -98,23 +105,23 @@ const AttendancePage = () => {
 				</div>
 			)}
 
-			{/* Class List with Headers */}
+			{/* Class List */}
 			{classList.length > 0 && !showForm && (
 				<div className="mt-10 bg-white/80 rounded-2xl shadow-lg p-8 w-full max-w-5xl">
 					<h2 className="text-xl font-semibold text-center mb-6 text-gray-800">
 						Class List
 					</h2>
 
-					{/* Header Row */}
+					{/* Header */}
 					<div className="grid grid-cols-4 md:grid-cols-5 bg-gray-200 rounded-lg py-3 px-4 font-semibold text-gray-700 mb-3 text-center">
 						<p>Class</p>
 						<p>Section</p>
 						<p>Subject</p>
 						<p>Action</p>
-						<p>Mark Attendance</p>
+						<p>Scanner</p>
 					</div>
 
-					{/* Data Rows */}
+					{/* Rows */}
 					<div className="flex flex-col gap-3">
 						{classList.map((cls, index) => (
 							<div
@@ -124,22 +131,23 @@ const AttendancePage = () => {
 								<p className="font-medium">{cls.className}</p>
 								<p>{cls.section}</p>
 								<p>{cls.subject}</p>
+
 								<button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
-									<a href="AddStudent">
-										Enter
-									</a>
+									<a href="AddStudent">Enter</a>
 								</button>
-								{/* Placeholder for Face Scanner */}
-								<div className="flex justify-center">
-									<button className="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600 transition">
-										Open Scanner
-									</button>
-								</div>
+
+								{/* FACE SCANNER OPEN BUTTON */}
+								<button
+									onClick={() => setScannerOpen(true)}
+									className="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600 transition"
+								>
+									Open Scanner
+								</button>
 							</div>
 						))}
 					</div>
 
-					{/* Add New Class Button */}
+					{/* Add new class */}
 					<div className="flex justify-center mt-8">
 						<button
 							onClick={() => setShowForm(true)}
@@ -150,6 +158,9 @@ const AttendancePage = () => {
 					</div>
 				</div>
 			)}
+
+			{/* Face Scanner Popup */}
+			{scannerOpen && <FaceScanner onClose={() => setScannerOpen(false)} />}
 		</div>
 	);
 };
