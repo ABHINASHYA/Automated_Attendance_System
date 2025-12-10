@@ -1,25 +1,58 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
+import CryptoJS from "crypto-js";
 
 const Login = () => {
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // ✅ Added loading state
+  const [error, setError] = useState(""); // ✅ Added error state
+
+  const handleLogin = async (e) => {
     e.preventDefault();
-    // ✅ You can add authentication logic here later
-    navigate("/AttendancePage"); // redirect to AttendancePage
+    setError(""); // ✅ Clear previous errors
+    setLoading(true); // ✅ Set loading to true
+
+    const encryptedPassword = CryptoJS.AES.encrypt(
+      password,
+      import.meta.env.VITE_SECRET_KEY
+    ).toString();
+
+    try {
+      const res = await axios.post("http://localhost:3000/api/auth/login", {
+        email,
+        password: encryptedPassword,
+      });
+
+      localStorage.setItem("token", res.data.token);
+      toast.success("Login successful!");
+      navigate("/AttendancePage");
+    } catch (err) {
+      const errorMessage = err.response?.data?.error || "Login failed!";
+      setError(errorMessage); // ✅ Set error state
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false); // ✅ Set loading to false
+    }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-800 to-cyan-200 relative overflow-hidden">
-      {/* Animated Background Circles */}
+      <Toaster position="top-right" />
+
+      {/* Background Animation */}
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
         transition={{ repeat: Infinity, duration: 6 }}
         className="absolute w-64 h-64 bg-white/20 rounded-full top-10 left-10 blur-3xl"
       ></motion.div>
+
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
@@ -53,22 +86,36 @@ const Login = () => {
         >
           <input
             type="email"
+            name="email"
             placeholder="Enter your email"
-            className="p-3 rounded-lg bg-white/20 text-white placeholder-gray-100 outline-none focus:ring-2 focus:ring-cyan-400 transition"
-          />
-          <input
-            type="password"
-            placeholder="Enter your password"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="p-3 rounded-lg bg-white/20 text-white placeholder-gray-100 outline-none focus:ring-2 focus:ring-cyan-400 transition"
           />
 
+          <input
+            type="password"
+            name="password"
+            placeholder="Enter your password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="p-3 rounded-lg bg-white/20 text-white placeholder-gray-100 outline-none focus:ring-2 focus:ring-cyan-400 transition"
+          />
+
+          {error && (
+            <p className="text-red-400 text-sm -mt-2">{error}</p>
+          )}
+
           <motion.button
             type="submit"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="mt-2 py-3 bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold rounded-lg shadow-lg hover:shadow-cyan-500/50 transition"
+            whileHover={{ scale: loading ? 1 : 1.05 }}
+            whileTap={{ scale: loading ? 1 : 0.95 }}
+            disabled={loading}
+            className="mt-2 py-3 bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold rounded-lg shadow-lg hover:shadow-cyan-500/50 transition disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </motion.button>
         </motion.form>
 
@@ -78,7 +125,7 @@ const Login = () => {
           transition={{ delay: 0.6 }}
           className="mt-6 text-gray-100 text-sm"
         >
-          Don’t have an account?{" "}
+          Don't have an account?{" "}
           <span className="text-blue-800 cursor-pointer hover:underline">
             <a href="/register">Register</a>
           </span>

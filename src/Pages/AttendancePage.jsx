@@ -1,168 +1,759 @@
 import React, { useState, useEffect } from "react";
 import FaceScanner from "./FaceScanner";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import toast, { Toaster } from "react-hot-toast";
+import CryptoJS from "crypto-js";
 
 const AttendancePage = () => {
-	const [showForm, setShowForm] = useState(false);
-	const [classList, setClassList] = useState([]);
-	const [scannerOpen, setScannerOpen] = useState(false);
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
-	const [formData, setFormData] = useState({
-		className: "",
-		section: "",
-		subject: "",
-	});
+  const [showForm, setShowForm] = useState(false);
+  const [classList, setClassList] = useState([]);
+  const [filteredClasses, setFilteredClasses] = useState([]);
+  const [scannerOpen, setScannerOpen] = useState(false);
 
-	const [schoolName, setSchoolName] = useState("");
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [profileEdit, setProfileEdit] = useState(false);
+  const [changePass, setChangePass] = useState(false);
 
-	// Mock API call
-	useEffect(() => {
-		fetch("/mockData/teacher.json")
-			.then((res) => res.json())
-			.then((data) => setSchoolName(data.schoolName))
-			.catch(() => setSchoolName("My School"));
-	}, []);
+  const [user, setUser] = useState(null);
+  const [editingClass, setEditingClass] = useState(null);
 
-	const handleChange = (e) => {
-		setFormData({ ...formData, [e.target.name]: e.target.value });
-	};
+  const [formData, setFormData] = useState({
+    className: "",
+    section: "",
+    subject: "",
+  });
 
-	const handleSubmit = (e) => {
-		e.preventDefault();
-		if (!formData.className || !formData.section || !formData.subject) return;
+  const [profileData, setProfileData] = useState({
+    fullName: "",
+    email: "",
+    schoolName: "",
+    role: "",
+    subjectName: "",
+    gender: "",
+  });
 
-		setClassList([...classList, formData]);
-		setFormData({ className: "", section: "", subject: "" });
-		setShowForm(false);
-	};
+  const [passwords, setPasswords] = useState({
+    oldPassword: "",
+    newPassword: "",
+  });
 
-	return (
-		<div className="min-h-screen bg-gradient-to-br from-blue-800 to-cyan-200 flex flex-col items-center py-10 px-4">
-			{/* School Name */}
-			<div className="w-full flex justify-start items-center mb-10">
-				<h1 className="text-xl md:text-2xl font-semibold text-white px-6 py-3 rounded-lg shadow-md">
-					{schoolName || "Loading..."}
-				</h1>
-			</div>
+  // ================= FETCH PROFILE =================
+  useEffect(() => {
+    if (!token) {
+      navigate("/login");
+      return;
+    }
 
-			{/* Empty State */}
-			{!showForm && classList.length === 0 && (
-				<div className="flex flex-col items-center mt-20 text-center">
-					<h2 className="text-4xl md:text-5xl font-semibold text-[#89ff9b] mb-4">
-						Automated Attendance System
-					</h2>
-					<p className="text-white text-lg mb-8">
-						Making attendance faster using AI-based face detection.
-					</p>
-					<button
-						onClick={() => setShowForm(true)}
-						className="bg-white border-2 border-gray-700 text-lg px-8 py-3 rounded-xl font-semibold hover:bg-gray-100 transition"
-					>
-						Create Class
-					</button>
-				</div>
-			)}
+    axios
+      .get("http://localhost:3000/api/auth/profile", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        setUser(res.data.user);
+        setProfileData(res.data.user);
+        fetchClasses(res.data.user);
+      })
+      .catch(() => {
+        localStorage.removeItem("token");
+        toast.error("Session expired! Please login again.");
+        navigate("/login");
+      });
+  }, [navigate, token]);
 
-			{/* Create Class Form */}
-			{showForm && (
-				<div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-sm mt-10">
-					<h3 className="text-center text-2xl font-semibold mb-6 text-gray-700">
-						Class Details
-					</h3>
+  // ================= FETCH CLASSES FROM DB =================
+  const fetchClasses = async (userdata) => {
+    try {
+      const url =
+        userdata.role === "Principal"
+          ? "http://localhost:3000/api/class/school-classes"
+          : "http://localhost:3000/api/class/my-classes";
 
-					<form onSubmit={handleSubmit} className="flex flex-col gap-4">
-						<input
-							type="text"
-							name="className"
-							value={formData.className}
-							onChange={handleChange}
-							placeholder="Class"
-							className="border-2 border-gray-400 rounded-lg px-4 py-2"
-						/>
-						<input
-							type="text"
-							name="section"
-							value={formData.section}
-							onChange={handleChange}
-							placeholder="Section"
-							className="border-2 border-gray-400 rounded-lg px-4 py-2"
-						/>
-						<input
-							type="text"
-							name="subject"
-							value={formData.subject}
-							onChange={handleChange}
-							placeholder="Subject"
-							className="border-2 border-gray-400 rounded-lg px-4 py-2"
-						/>
+      const res = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-						<button
-							type="submit"
-							className="mt-4 bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
-						>
-							Enter
-						</button>
-					</form>
-				</div>
-			)}
+      const classes = (res.data.classes || []).reverse();
+      setClassList(classes);
+      setFilteredClasses(classes);
+    } catch (err) {
+      console.error("Error fetching classes", err);
+    }
+  };
 
-			{/* Class List */}
-			{classList.length > 0 && !showForm && (
-				<div className="mt-10 bg-white/80 rounded-2xl shadow-lg p-8 w-full max-w-5xl">
-					<h2 className="text-xl font-semibold text-center mb-6 text-gray-800">
-						Class List
-					</h2>
+  const userInitial = user?.fullName?.charAt(0).toUpperCase() || "T";
+  const isPrincipal = user?.role === "Principal";
+  const isApproved = user?.status === "Approved";
 
-					{/* Header */}
-					<div className="grid grid-cols-4 md:grid-cols-5 bg-gray-200 rounded-lg py-3 px-4 font-semibold text-gray-700 mb-3 text-center">
-						<p>Class</p>
-						<p>Section</p>
-						<p>Subject</p>
-						<p>Action</p>
-						<p>Scanner</p>
-					</div>
+  // ================= LOGOUT =================
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    toast.success("Logged out successfully!");
+    navigate("/login");
+  };
 
-					{/* Rows */}
-					<div className="flex flex-col gap-3">
-						{classList.map((cls, index) => (
-							<div
-								key={index}
-								className="grid grid-cols-4 md:grid-cols-5 items-center border border-gray-300 rounded-lg px-4 py-3 bg-white text-center"
-							>
-								<p className="font-medium">{cls.className}</p>
-								<p>{cls.section}</p>
-								<p>{cls.subject}</p>
+  // ================= UPDATE PROFILE =================
+  const handleUpdateProfile = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.put(
+        "http://localhost:3000/api/auth/update-profile",
+        profileData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setUser(profileData);
+      toast.success("Profile updated!");
+      setProfileEdit(false);
+    } catch (err) {
+      const msg = err.response?.data?.error || "Profile update failed!";
+      toast.error(msg);
+    }
+  };
 
-								<button className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
-									<a href="AddStudent">Enter</a>
-								</button>
+  // ================= CHANGE PASSWORD (with AES encryption) =================
+  const handlePasswordUpdate = async () => {
+    const token = localStorage.getItem("token");
 
-								{/* FACE SCANNER OPEN BUTTON */}
-								<button
-									onClick={() => setScannerOpen(true)}
-									className="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600 transition"
-								>
-									Open Scanner
-								</button>
-							</div>
-						))}
-					</div>
+    if (!passwords.oldPassword || !passwords.newPassword) {
+      return toast.error("Both fields are required!");
+    }
 
-					{/* Add new class */}
-					<div className="flex justify-center mt-8">
-						<button
-							onClick={() => setShowForm(true)}
-							className="bg-white border-2 border-gray-700 text-lg px-5 py-2 rounded-xl font-semibold hover:bg-gray-100 transition"
-						>
-							Add New Class
-						</button>
-					</div>
-				</div>
-			)}
+    const encryptedOld = CryptoJS.AES.encrypt(
+      passwords.oldPassword,
+      import.meta.env.VITE_SECRET_KEY
+    ).toString();
+    const encryptedNew = CryptoJS.AES.encrypt(
+      passwords.newPassword,
+      import.meta.env.VITE_SECRET_KEY
+    ).toString();
 
-			{/* Face Scanner Popup */}
-			{scannerOpen && <FaceScanner onClose={() => setScannerOpen(false)} />}
-		</div>
-	);
+    try {
+      const res = await axios.put(
+        "http://localhost:3000/api/auth/change-password",
+        {
+          oldPassword: encryptedOld,
+          newPassword: encryptedNew,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      toast.success(res.data.message || "Password changed successfully!");
+      setPasswords({ oldPassword: "", newPassword: "" });
+      setChangePass(false);
+    } catch (err) {
+      const msg = err.response?.data?.error || "Password change failed!";
+      toast.error(msg);
+    }
+  };
+
+  // ================= CLASS FORM HANDLERS =================
+  const handleChangeClass = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const openCreateClassModal = () => {
+    if (!isPrincipal && !isApproved) {
+      toast.error("You need principal approval to create classes!");
+      return;
+    }
+    setEditingClass(null);
+    setFormData({ className: "", section: "", subject: "" });
+    setShowForm(true);
+  };
+
+  const openEditClassModal = (cls) => {
+    // Principal can edit any; teacher only own classes
+    const teacherId = cls.teacherId?._id || cls.teacherId;
+    if (!isPrincipal && teacherId !== user?.id && teacherId !== user?._id) {
+      toast.error("You can only edit your own classes!");
+      return;
+    }
+    setEditingClass(cls);
+    setFormData({
+      className: cls.className,
+      section: cls.section,
+      subject: cls.subject,
+    });
+    setShowForm(true);
+  };
+
+  const handleSubmitClass = async (e) => {
+    e.preventDefault();
+
+    if (!isPrincipal && !isApproved) {
+      toast.error("You need principal approval to create or edit classes!");
+      setShowForm(false);
+      return;
+    }
+
+    if (!formData.className || !formData.section || !formData.subject) {
+      toast.error("All fields are required!");
+      return;
+    }
+
+    try {
+      if (editingClass) {
+        await axios.put(
+          `http://localhost:3000/api/class/${editingClass._id}`,
+          formData,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        toast.success("Class updated!");
+      } else {
+        await axios.post("http://localhost:3000/api/class/create", formData, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        toast.success("Class added!");
+      }
+
+      setFormData({ className: "", section: "", subject: "" });
+      setEditingClass(null);
+      setShowForm(false);
+      fetchClasses(user);
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Failed to save class!");
+    }
+  };
+
+  // ================= DELETE CLASS =================
+  const handleDeleteClass = async (cls) => {
+    const teacherId = cls.teacherId?._id || cls.teacherId;
+    if (!isPrincipal && teacherId !== user?.id && teacherId !== user?._id) {
+      toast.error("You can only delete your own classes!");
+      return;
+    }
+
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this class?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      await axios.delete(`http://localhost:3000/api/class/${cls._id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      toast.success("Class deleted!");
+      fetchClasses(user);
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Delete failed!");
+    }
+  };
+
+  // ================= SEARCH & SORT =================
+  const handleSearch = (text) => {
+    const query = text.toLowerCase();
+    const filtered = classList.filter((cls) => {
+      const teacherName = cls.teacherId?.fullName || "";
+      return (
+        cls.className.toLowerCase().includes(query) ||
+        cls.section.toLowerCase().includes(query) ||
+        cls.subject.toLowerCase().includes(query) ||
+        teacherName.toLowerCase().includes(query)
+      );
+    });
+    setFilteredClasses(filtered);
+  };
+
+  const sortAZ = () => {
+    setFilteredClasses((prev) =>
+      [...prev].sort((a, b) => a.className.localeCompare(b.className))
+    );
+  };
+
+  const sortZA = () => {
+    setFilteredClasses((prev) =>
+      [...prev].sort((a, b) => b.className.localeCompare(a.className))
+    );
+  };
+
+  const sortNewest = () => {
+    setFilteredClasses((prev) =>
+      [...prev].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      )
+    );
+  };
+
+  const sortOldest = () => {
+    setFilteredClasses((prev) =>
+      [...prev].sort(
+        (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+      )
+    );
+  };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-800 to-cyan-200">
+        <Toaster position="top-right" />
+        <p className="text-white text-xl">Loading...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-800 to-cyan-200 flex flex-col items-center py-10 px-4">
+      <Toaster position="top-right" />
+
+      {/* HEADER: School left, Profile right */}
+      <div className="w-full flex justify-between items-center px-4 mb-8">
+        <h1 className="text-xl md:text-2xl font-semibold text-white">
+          {user.schoolName}
+        </h1>
+
+        <motion.div
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setShowProfileModal(true)}
+          className="w-12 h-12 bg-white text-blue-700 font-bold flex items-center 
+                     justify-center rounded-full cursor-pointer shadow-xl 
+                     border border-blue-300"
+        >
+          {userInitial}
+        </motion.div>
+      </div>      {/* PENDING APPROVAL BANNER */}
+      {!isPrincipal && !isApproved && (
+        <div className="w-full max-w-5xl mb-6">
+          <div className="bg-yellow-500/20 border-2 border-yellow-500 rounded-xl p-4 text-white backdrop-blur-md">
+            <p className="text-center font-semibold">
+              ⏳ Your account is pending approval from the Principal. You cannot
+              create classes until approved.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* HERO TEXT */}
+      <div className="w-full max-w-5xl flex flex-col items-center text-center mb-2">
+        <h2 className="text-3xl md:text-4xl font-semibold text-[#89ff9b] mb-3">
+          Automated Attendance System
+        </h2>
+        <p className="text-white text-lg mb-4 max-w-2xl">
+          Making attendance faster and smoother using AI-based face detection.
+        </p>
+      </div>
+
+      {/* Create Class Button */}
+      <motion.button
+        whileHover={{ scale: 1.05, y: -2 }}
+        whileTap={{ scale: 0.97 }}
+        onClick={openCreateClassModal}
+        className="bg-white/90 border border-gray-300 text-lg px-8 py-3 rounded-2xl font-semibold 
+                   hover:bg-gray-100 transition shadow-md mb-4"
+      >
+        {editingClass ? "Edit Class" : "Create Class"}
+      </motion.button>
+
+      {/* STATS */}
+      <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div className="bg-white/15 border border-white/20 rounded-2xl p-4 text-white backdrop-blur-md shadow-md">
+          <p className="text-sm text-cyan-100">Total Classes</p>
+          <p className="text-2xl font-bold mt-1">{classList.length}</p>
+        </div>
+        <div className="bg-white/15 border border-white/20 rounded-2xl p-4 text-white backdrop-blur-md shadow-md">
+          <p className="text-sm text-cyan-100">Teacher</p>
+          <p className="text-lg font-semibold mt-1">{user.fullName}</p>
+        </div>
+        <div className="bg-white/15 border border-white/20 rounded-2xl p-4 text-white backdrop-blur-md shadow-md">
+          <p className="text-sm text-cyan-100">Status</p>
+          <p className="text-lg font-semibold mt-1">
+            {isPrincipal ? "Principal" : isApproved ? "✅ Approved" : "⏳ Pending"}
+          </p>
+        </div>
+      </div>
+
+      {/* Manage Teachers button (Principal only) */}
+      {isPrincipal && (
+        <div className="w-full max-w-5xl flex justify-end mb-4">
+          <button
+            className="bg-purple-600 text-white px-5 py-2 rounded-lg shadow-md hover:bg-purple-700"
+            onClick={() => navigate("/manage-teachers")}
+          >
+            Manage Teachers
+          </button>
+        </div>
+      )}
+
+      {/* SEARCH + FILTER JUST ABOVE HEADING */}
+      <div className="w-full max-w-5xl flex flex-col gap-3 mb-4">
+        <motion.input
+          whileFocus={{ scale: 1.01 }}
+          type="text"
+          placeholder="Search by class, section, subject or teacher..."
+          className="p-3 rounded-xl border border-gray-300 outline-none text-white shadow-sm"
+          onChange={(e) => handleSearch(e.target.value)}
+        />
+        <div className="flex flex-wrap gap-2 text-sm">
+          <motion.button
+            whileHover={{ scale: 1.05, y: -1 }}
+            onClick={sortAZ}
+            className="bg-blue-700 text-white px-3 py-2 rounded-lg"
+          >
+            Sort A–Z
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05, y: -1 }}
+            onClick={sortZA}
+            className="bg-blue-700 text-white px-3 py-2 rounded-lg"
+          >
+            Sort Z–A
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05, y: -1 }}
+            onClick={sortNewest}
+            className="bg-blue-700 text-white px-3 py-2 rounded-lg"
+          >
+            Newest
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05, y: -1 }}
+            onClick={sortOldest}
+            className="bg-blue-700 text-white px-3 py-2 rounded-lg"
+          >
+            Oldest
+          </motion.button>
+        </div>
+      </div>
+
+      {/* CLASS LIST */}
+      {filteredClasses.length > 0 && (
+        <div className="w-full max-w-5xl mt-2">
+          <h3 className="text-xl font-semibold text-white mb-4">
+            {isPrincipal ? "All Classes in School" : "Your Classes"}
+          </h3>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            {filteredClasses.map((cls) => (
+              <motion.div
+                key={cls._id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileHover={{ scale: 1.02 }}
+                className="bg-white rounded-2xl p-4 shadow-md flex flex-col md:flex-row md:items-center md:justify-between"
+              >
+                <div className="mb-3 md:mb-0 text-left">
+                  <p className="text-sm text-gray-500">Class</p>
+                  <p className="text-lg font-semibold">{cls.className}</p>
+
+                  <p className="text-sm text-gray-500 mt-1">Section</p>
+                  <p className="text-md font-medium">{cls.section}</p>
+
+                  <p className="text-sm text-gray-500 mt-1">Subject</p>
+                  <p className="text-md font-medium">{cls.subject}</p>
+
+                  {/* 🧑‍🏫 TEACHER NAME BADGE */}
+                  <div className="mt-3 inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-bold">
+                    🧑‍🏫 {cls.teacherId?.fullName || "Unknown Teacher"}
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={() => navigate("/AddStudent")}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+                  >
+                    Enter
+                  </button>
+                  <button
+                    onClick={() => setScannerOpen(true)}
+                    className="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600 transition"
+                  >
+                    Scanner
+                  </button>
+                  <button
+                    onClick={() => openEditClassModal(cls)}
+                    className="bg-yellow-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-yellow-600 transition"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteClass(cls)}
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* FACE SCANNER POPUP */}
+      {scannerOpen && <FaceScanner onClose={() => setScannerOpen(false)} />}
+
+      {/* ========= CREATE / EDIT CLASS MODAL ========= */}
+      <AnimatePresence>
+        {showForm && (
+          <>
+            <motion.div
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => {
+                setShowForm(false);
+                setEditingClass(null);
+              }}
+            />
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.8, opacity: 0, y: 20 }}
+              className="fixed inset-0 flex items-center justify-center px-4"
+            >
+              <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md relative">
+                <button
+                  className="absolute right-4 top-3 text-gray-500 font-bold"
+                  onClick={() => {
+                    setShowForm(false);
+                    setEditingClass(null);
+                  }}
+                >
+                  X
+                </button>
+                <h3 className="text-center text-2xl font-semibold mb-6 text-gray-700">
+                  {editingClass ? "Edit Class" : "Class Details"}
+                </h3>
+
+                <form
+                  onSubmit={handleSubmitClass}
+                  className="flex flex-col gap-4"
+                >
+                  <input
+                    type="text"
+                    name="className"
+                    value={formData.className}
+                    onChange={handleChangeClass}
+                    placeholder="Class"
+                    className="border-2 border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"
+                  />
+                  <input
+                    type="text"
+                    name="section"
+                    value={formData.section}
+                    onChange={handleChangeClass}
+                    placeholder="Section"
+                    className="border-2 border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"
+                  />
+                  <input
+                    type="text"
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChangeClass}
+                    placeholder="Subject"
+                    className="border-2 border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"
+                  />
+
+                  <button
+                    type="submit"
+                    className="mt-4 bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+                  >
+                    {editingClass ? "Save Changes" : "Enter"}
+                  </button>
+                </form>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* ================= PROFILE DRAWER ================= */}
+      <AnimatePresence>
+        {showProfileModal && (
+          <>
+            <motion.div
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => {
+                setShowProfileModal(false);
+                setProfileEdit(false);
+                setChangePass(false);
+              }}
+            />
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", stiffness: 90 }}
+              className="fixed right-0 top-0 h-full w-80 bg-gradient-to-br 
+                         from-blue-700 to-cyan-400 p-6 shadow-2xl text-white"
+            >
+              {/* Close X */}
+              <button
+                className="text-xl font-bold absolute right-4 top-3"
+                onClick={() => {
+                  setShowProfileModal(false);
+                  setProfileEdit(false);
+                  setChangePass(false);
+                }}
+              >
+                X
+              </button>
+
+              <h2 className="text-2xl font-bold mb-4">Profile</h2>
+              <hr className="border-white/30 mb-4" />
+
+              {!profileEdit && !changePass && (
+                <>
+                  <p>
+                    <strong>Name:</strong> {user.fullName}
+                  </p>
+                  <p>
+                    <strong>Email:</strong> {user.email}
+                  </p>
+                  <p>
+                    <strong>Role:</strong> {user.role}
+                  </p>
+                  <p>
+                    <strong>Subject:</strong> {user.subjectName}
+                  </p>
+                  <p>
+                    <strong>Gender:</strong> {user.gender}
+                  </p>
+                  <p>
+                    <strong>School:</strong> {user.schoolName}
+                  </p>
+                  <p>
+                    <strong>Status:</strong>{" "}
+                    {isPrincipal ? "Principal" : user.status}
+                  </p>
+                  <p>
+                    <strong>Total Classes:</strong> {classList.length}
+                  </p>
+
+                  <button
+                    className="mt-5 bg-yellow-300 text-blue-900 py-2 rounded-lg font-bold hover:bg-yellow-400 w-full"
+                    onClick={() => setProfileEdit(true)}
+                  >
+                    ✏️ Edit Profile
+                  </button>
+
+                  <button
+                    className="mt-4 bg-blue-500 py-2 rounded-lg font-bold hover:bg-blue-600 w-full"
+                    onClick={() => setChangePass(true)}
+                  >
+                    🔐 Change Password
+                  </button>
+
+                  <button
+                    className="mt-4 bg-red-500 py-2 rounded-lg font-bold hover:bg-red-600 w-full"
+                    onClick={handleLogout}
+                  >
+                    🚪 Logout
+                  </button>
+                </>
+              )}
+
+              {profileEdit && (
+                <div className="flex flex-col gap-3 mt-2">
+                  <input
+                    className="p-2 rounded bg-white/30 border text-white"
+                    name="fullName"
+                    value={profileData.fullName}
+                    onChange={(e) =>
+                      setProfileData({
+                        ...profileData,
+                        fullName: e.target.value,
+                      })
+                    }
+                  />
+                  <input
+                    className="p-2 rounded bg-white/30 border text-white"
+                    name="email"
+                    value={profileData.email}
+                    onChange={(e) =>
+                      setProfileData({
+                        ...profileData,
+                        email: e.target.value,
+                      })
+                    }
+                  />
+                  <input
+                    className="p-2 rounded bg-white/30 border text-white"
+                    name="schoolName"
+                    value={profileData.schoolName}
+                    onChange={(e) =>
+                      setProfileData({
+                        ...profileData,
+                        schoolName: e.target.value,
+                      })
+                    }
+                  />
+                  <button
+                    className="bg-green-500 py-2 rounded font-bold"
+                    onClick={handleUpdateProfile}
+                  >
+                    💾 Save
+                  </button>
+                  <button
+                    className="bg-gray-400 py-2 rounded font-bold"
+                    onClick={() => setProfileEdit(false)}
+                  >
+                    🔙 Cancel
+                  </button>
+                </div>
+              )}
+
+              {changePass && (
+                <div className="flex flex-col gap-3 mt-2">
+                  <input
+                    type="password"
+                    placeholder="Old Password"
+                    className="p-2 rounded bg-white/30 border text-white"
+                    value={passwords.oldPassword}
+                    onChange={(e) =>
+                      setPasswords({
+                        ...passwords,
+                        oldPassword: e.target.value,
+                      })
+                    }
+                  />
+                  <input
+                    type="password"
+                    placeholder="New Password"
+                    className="p-2 rounded bg-white/30 border text-white"
+                    value={passwords.newPassword}
+                    onChange={(e) =>
+                      setPasswords({
+                        ...passwords,
+                        newPassword: e.target.value,
+                      })
+                    }
+                  />
+                  <button
+                    className="bg-green-500 py-2 rounded font-bold"
+                    onClick={handlePasswordUpdate}
+                  >
+                    ✔ Change
+                  </button>
+                  <button
+                    className="bg-gray-400 py-2 rounded font-bold"
+                    onClick={() => setChangePass(false)}
+                  >
+                    🔙 Cancel
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 };
 
 export default AttendancePage;

@@ -9,6 +9,8 @@ import Login from './Pages/Login'
 import AttendancePage from './Pages/AttendancePage'
 import AddStudent from './Pages/AddStudent'
 import FaceScanner from './Pages/FaceScanner'
+import ManageTeachers from './Pages/manageTeachers'
+import TeacherClasses from './Pages/TeacherClasses'
 
 function App() {
 
@@ -22,9 +24,10 @@ function App() {
         <Route path="/Register" element={<Register />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/FaceScanner" element={<FaceScanner />} />
-
         <Route path="/AttendancePage" element={<AttendancePage />} />
+        <Route path="/manage-teachers" element={<ManageTeachers />} />
         <Route path="/AddStudent" element={<AddStudent />} />
+        <Route path="/teacher-classes/:id" element={<TeacherClasses />} />
       </Routes>
     </Router>
   )
