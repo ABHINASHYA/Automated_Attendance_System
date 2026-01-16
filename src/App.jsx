@@ -7,7 +7,7 @@ import Contect from './Pages/Contect'
 import Register from './Pages/Register'
 import Login from './Pages/Login'
 import AttendancePage from './Pages/AttendancePage'
-import AddStudent from './Pages/AddStudent'
+import AddStudentPage from './Pages/AddStudent'
 import FaceScanner from './Pages/FaceScanner'
 import ManageTeachers from './Pages/manageTeachers'
 import TeacherClasses from './Pages/TeacherClasses'
@@ -26,7 +26,8 @@ function App() {
         <Route path="/FaceScanner" element={<FaceScanner />} />
         <Route path="/AttendancePage" element={<AttendancePage />} />
         <Route path="/manage-teachers" element={<ManageTeachers />} />
-        <Route path="/AddStudent" element={<AddStudent />} />
+        <Route path="/AddStudent" element={<AddStudentPage />} />
+        <Route path="/AddStudent/:classId" element={<AddStudentPage />} />
         <Route path="/teacher-classes/:id" element={<TeacherClasses />} />
       </Routes>
     </Router>

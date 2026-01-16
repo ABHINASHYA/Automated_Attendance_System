@@ -34,3 +34,6 @@ export const allowPrincipal = (req, res, next) => {
     }
     next();
 };
+
+
+export default protect;
