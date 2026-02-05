@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import FaceScanner from "./FaceScanner";
+import AutoAttendanceScanner from "./AutoAttendanceScanner";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
 import CryptoJS from "crypto-js";
+import ClassAttendanceScanner from "../Components/ClassAttendanceScanner";
+
 
 const AttendancePage = () => {
   const navigate = useNavigate();
@@ -18,6 +20,10 @@ const AttendancePage = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [profileEdit, setProfileEdit] = useState(false);
   const [changePass, setChangePass] = useState(false);
+
+  const [openScanner, setOpenScanner] = useState(false);
+  const [scanClassId, setScanClassId] = useState(null);
+
 
   const [user, setUser] = useState(null);
   const [editingClass, setEditingClass] = useState(null);
@@ -460,28 +466,32 @@ const AttendancePage = () => {
 
                 <div className="flex flex-col gap-2">
                   <button
-                      onClick={() => navigate(`/AddStudent/${cls._id}`)}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+                    onClick={() => navigate(`/AddStudent/${cls._id}`)}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition hover:cursor-pointer"
                   >
-                      Enter
+                    Enter
                   </button>
                   <button
-                      onClick={() => setScannerOpen(true)}
-                      className="bg-green-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-600 transition"
+                    onClick={() => {
+                      setScanClassId(cls._id);
+                      setOpenScanner(true);
+                      }}
+                      className="bg-green-500 text-white px-4 py-2 rounded-lg hover:cursor-pointer"
+                    >
+                          Scanner
+                    </button>
+
+                  <button
+                    onClick={() => openEditClassModal(cls)}
+                    className="bg-yellow-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-yellow-600 transition hover:cursor-pointer"
                   >
-                      Scanner
+                    Edit
                   </button>
                   <button
-                      onClick={() => openEditClassModal(cls)}
-                      className="bg-yellow-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-yellow-600 transition"
+                    onClick={() => handleDeleteClass(cls)}
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition hover:cursor-pointer"
                   >
-                      Edit
-                  </button>
-                  <button
-                      onClick={() => handleDeleteClass(cls)}
-                      className="bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition"
-                  >
-                      Delete
+                    Delete
                   </button>
                 </div>
               </motion.div>
@@ -491,7 +501,7 @@ const AttendancePage = () => {
       )}
 
       {/* FACE SCANNER POPUP */}
-      {scannerOpen && <FaceScanner onClose={() => setScannerOpen(false)} />}
+      {scannerOpen && <AutoAttendanceScanner onClose={() => setScannerOpen(false)} />}
 
       {/* ========= CREATE / EDIT CLASS MODAL ========= */}
       <AnimatePresence>
@@ -752,6 +762,17 @@ const AttendancePage = () => {
           </>
         )}
       </AnimatePresence>
+        {openScanner && scanClassId && (
+          <ClassAttendanceScanner
+            classId={scanClassId}
+            token={token}
+            onClose={() => {
+              setOpenScanner(false);
+              setScanClassId(null);
+            }}
+          />
+        )}
+
     </div>
   );
 };

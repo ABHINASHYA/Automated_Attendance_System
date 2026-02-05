@@ -6,7 +6,9 @@ import {
   deleteStudent,
 } from "../controllers/student.controller.js";
 
+import * as controller from "../controllers/student.controller.js";
 import authMiddleware from "../middleware/auth.middleware.js";
+import protect from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
@@ -21,5 +23,29 @@ router.put("/:studentId", authMiddleware, updateStudent);
 
 // Delete student
 router.delete("/:studentId", authMiddleware, deleteStudent);
+
+
+// ===== FACE ROUTES =====
+router.post(
+  "/:studentId/register-face",
+  protect,
+  controller.registerStudentFace
+);
+
+router.put(
+  "/:studentId/update-face",
+  protect,
+  controller.updateStudentFace
+);
+
+router.delete(
+  "/:studentId/remove-face",
+  protect,
+  controller.removeStudentFace
+);
+
+
+
+
 
 export default router;

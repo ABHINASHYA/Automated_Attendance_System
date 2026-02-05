@@ -7,7 +7,7 @@ import {
   getAllClassesInSchool,
   deleteClass,
   updateClass,
-  getTeacherClasses
+  getTeacherClasses,
 } from "../controllers/class.controller.js";
 
 const router = express.Router();
@@ -18,6 +18,7 @@ router.get("/school-classes", authMiddleware, getAllClassesInSchool);
 router.delete("/:id", authMiddleware, deleteClass);
 router.put("/:id", authMiddleware, updateClass);
 router.get("/teacher-classes/:id", authMiddleware, getTeacherClasses);
+router.get("/:id", authMiddleware, getMyClasses);
 
 
 export default router;

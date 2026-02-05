@@ -1,6 +1,7 @@
 import Student from "../models/student.model.js";
 import mongoose from "mongoose";
 import Class from "../models/class.model.js";
+import * as studentService from "../services/student.service.js";
 
 /**
  * CREATE STUDENT
@@ -177,5 +178,133 @@ export const deleteStudent = async (req, res) => {
       success: false,
       message: error.message,
     });
+  }
+};
+
+
+
+// ===== REGISTER FACE =====
+// ===== REGISTER FACE =====
+export const registerStudentFace = async (req, res) => {
+  try {
+    const { descriptor } = req.body;
+
+    if (!Array.isArray(descriptor) || descriptor.length === 0) {
+      return res.status(400).json({ error: "Face descriptor required" });
+    }
+
+    const resolvedSchoolId = req.user?.schoolId || req.user?.id || req.user?._id;
+
+    const student = await Student.findOneAndUpdate(
+      {
+        _id: req.params.studentId,
+        schoolId: new mongoose.Types.ObjectId(String(resolvedSchoolId))
+      },
+      {
+        $set: { faceDescriptor: descriptor }
+      },
+      { new: true }
+    );
+
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    res.json({
+      success: true,
+      message: "Face registered successfully",
+      student
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+// ===== UPDATE FACE =====
+export const updateStudentFace = async (req, res) => {
+  try {
+    const { descriptor } = req.body;
+
+    if (!Array.isArray(descriptor) || descriptor.length === 0) {
+      return res.status(400).json({ error: "Face descriptor required" });
+    }
+
+    const resolvedSchoolId = req.user?.schoolId || req.user?.id || req.user?._id;
+
+    const student = await Student.findOneAndUpdate(
+      {
+        _id: req.params.studentId,
+        schoolId: new mongoose.Types.ObjectId(String(resolvedSchoolId))
+      },
+      {
+        $set: { faceDescriptor: descriptor }
+      },
+      { new: true }
+    );
+
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    res.json({
+      success: true,
+      message: "Face updated successfully",
+      student
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+// ===== REMOVE FACE =====
+// ===== REMOVE FACE =====
+export const removeStudentFace = async (req, res) => {
+  try {
+    const resolvedSchoolId = req.user?.schoolId || req.user?.id || req.user?._id;
+
+    const student = await Student.findOneAndUpdate(
+      {
+        _id: req.params.studentId,
+        schoolId: new mongoose.Types.ObjectId(String(resolvedSchoolId))
+      },
+      {
+        $set: { faceDescriptor: [] }
+      },
+      { new: true }
+    );
+
+    if (!student) {
+      return res.status(404).json({ error: "Student not found" });
+    }
+
+    res.json({
+      success: true,
+      message: "Face data removed successfully",
+      student
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+export const getSingleClass = async (req, res) => {
+  try {
+    const cls = await classService.getSingleClassById(req.params.id);
+
+    res.json({
+      success: true,
+      class: cls,
+    });
+  } catch (err) {
+    if (err.message === "Class not found") {
+      return res.status(404).json({ error: err.message });
+    }
+    res.status(500).json({ error: "Server error" });
   }
 };

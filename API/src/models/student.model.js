@@ -46,7 +46,6 @@ const studentSchema = new mongoose.Schema(
       required: true,
     },
 
-    // ✅ MOST IMPORTANT FIX
     classId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Class",
@@ -54,13 +53,20 @@ const studentSchema = new mongoose.Schema(
       index: true,
     },
 
-    // optional but recommended
+
     schoolId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "School",
       required: true,
       index: true,
     },
+
+    // ===== FACE DATA =====
+    faceDescriptor: {
+      type: [Number], // 128-length float array
+      default: [],
+    },
+
   },
   {
     timestamps: true,

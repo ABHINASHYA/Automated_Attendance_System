@@ -8,7 +8,7 @@ import Register from './Pages/Register'
 import Login from './Pages/Login'
 import AttendancePage from './Pages/AttendancePage'
 import AddStudentPage from './Pages/AddStudent'
-import FaceScanner from './Pages/FaceScanner'
+import AutoAttendanceScanner from './Pages/AutoAttendanceScanner'
 import ManageTeachers from './Pages/manageTeachers'
 import TeacherClasses from './Pages/TeacherClasses'
 
@@ -23,7 +23,7 @@ function App() {
         <Route path="/contact" element={<Contect />} />
         <Route path="/Register" element={<Register />} />
         <Route path="/Login" element={<Login />} />
-        <Route path="/FaceScanner" element={<FaceScanner />} />
+        <Route path="/AutoAttendanceScanner" element={<AutoAttendanceScanner />} />
         <Route path="/AttendancePage" element={<AttendancePage />} />
         <Route path="/manage-teachers" element={<ManageTeachers />} />
         <Route path="/AddStudent" element={<AddStudentPage />} />

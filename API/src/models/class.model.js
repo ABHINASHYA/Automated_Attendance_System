@@ -5,6 +5,8 @@ const classSchema = new mongoose.Schema(
     className: { type: String, required: true },
     section: { type: String, required: true },
     subject: { type: String, required: true },
+    schoolId: { type: mongoose.Schema.Types.ObjectId, ref: "School", required: true },
+    teacherId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 
     teacherId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -15,7 +17,10 @@ const classSchema = new mongoose.Schema(
     schoolName: {
       type: String,
       required: true,
-    }
+    },
+
+    
+
   },
   { timestamps: true }
 );

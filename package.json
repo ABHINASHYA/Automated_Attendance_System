@@ -11,12 +11,15 @@
     "start": "node index.js"
   },
   "dependencies": {
+    "@mediapipe/camera_utils": "^0.3.1675466862",
+    "@mediapipe/face_detection": "^0.4.1646425229",
     "@tailwindcss/vite": "^4.1.14",
+    "@tensorflow/tfjs-backend-webgl": "^4.22.0",
+    "@vladmandic/face-api": "^1.7.15",
     "axios": "^1.13.2",
     "crypto-js": "^4.2.0",
     "emailjs": "^4.0.3",
     "emailjs-com": "^3.2.0",
-    "face-api.js": "^0.20.1",
     "framer-motion": "^12.23.24",
     "lucide-react": "^0.546.0",
     "react": "^19.1.1",

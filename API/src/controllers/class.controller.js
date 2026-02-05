@@ -17,7 +17,7 @@ export const createClass = async (req, res) => {
     };
 
     const createdClass = await createClassService(classData);
-    res.status(201).json({ message: "Class created", class: createdClass });
+    res.status(200).json({ message: "Class created", class: createdClass });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }

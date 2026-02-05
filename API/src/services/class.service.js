@@ -38,3 +38,10 @@ export const updateClassService = async (id, updates, user) => {
   await cls.save();
   return cls;
 };
+
+
+export const getSingleClassById = async (classId) => {
+  const cls = await Class.findById(classId);
+  if (!cls) throw new Error("Class not found");
+  return cls;
+};

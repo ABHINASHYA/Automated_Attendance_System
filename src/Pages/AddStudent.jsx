@@ -4,6 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import CryptoJS from 'crypto-js';
+import FaceRegistrationScanner from "../Components/FaceRegistrationScanner";
+
 
 const AddStudentPage = () => {
   const { classId } = useParams();
@@ -25,6 +27,9 @@ const AddStudentPage = () => {
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [profileEdit, setProfileEdit] = useState(false);
   const [changePass, setChangePass] = useState(false);
+  const [openFaceScanner, setOpenFaceScanner] = useState(false);
+  const [newStudentId, setNewStudentId] = useState(null);
+
   
   const [formData, setFormData] = useState({
     name: '',
@@ -307,8 +312,13 @@ const AddStudentPage = () => {
           studentData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
-        console.log('✅ Create response:', response.data);
-        toast.success(`Student added successfully!`);
+
+        toast.success("Student added! Now register face...");
+
+        // 👉 Save new studentId and open face scanner
+        const createdStudent = response.data.data || response.data.student || response.data;
+        setNewStudentId(createdStudent._id);
+        setOpenFaceScanner(true);
       }
 
       // Reset form and close modal
@@ -325,11 +335,9 @@ const AddStudentPage = () => {
         rollNo: ''
       });
       
-      // Refresh students for THE CURRENT CLASS ONLY
-      console.log('🔄 Refreshing students for class:', activeClassId);
       await fetchStudents(activeClassId);
     } catch (err) {
-      console.error('❌ Error:', err);
+      console.error('Error:', err);
       console.error('Error response:', err.response?.data);
       const errorMsg = err.response?.data?.message || err.response?.data?.error || 'Failed to save student!';
       toast.error(errorMsg);
@@ -1126,7 +1134,22 @@ const AddStudentPage = () => {
           </>
         )}
       </AnimatePresence>
+
+        {openFaceScanner && newStudentId && (
+            <FaceRegistrationScanner
+              studentId={newStudentId}
+              token={token}
+              onClose={() => {
+                setOpenFaceScanner(false);
+                setNewStudentId(null);
+              }}
+            />
+        )}
+
+
     </div>
+
+    
   );
 };
 
