@@ -18,10 +18,19 @@ const Login = () => {
     setError(""); // ✅ Clear previous errors
     setLoading(true); // ✅ Set loading to true
 
-    const encryptedPassword = CryptoJS.AES.encrypt(
-      password,
-      import.meta.env.VITE_SECRET_KEY
-    ).toString();
+    const SECRET_KEY = import.meta.env.VITE_SECRET_KEY;
+
+  if (!SECRET_KEY) {
+    toast.error("Configuration error. Please contact admin.");
+    setLoading(false);
+    return;
+  }
+
+  const encryptedPassword = CryptoJS.AES.encrypt(
+    password,
+    SECRET_KEY
+  ).toString();
+
 
     try {
       const res = await axios.post("https://inclass-dnhc.onrender.com/api/auth/login", {
