@@ -5,18 +5,123 @@ export const markAttendance = async (req, res) => {
   res.json(attendance);
 };
 
-export const toggleAttendance = async (req, res) => {
-  const attendance = await attendanceService.toggleAttendance(
-    req.params.studentId,
-    req.body
-  );
-  res.json(attendance);
+export const getAttendanceByClass = async (req, res) => {
+  try {
+    const { classId } = req.params;
+    const { date } = req.query;
+
+    const resolvedSchoolId =
+      req.user?.schoolId || req.user?.id || req.user?._id;
+
+    let filter = {
+      classId,
+      schoolId: resolvedSchoolId
+    };
+
+    if (date) {
+      const start = new Date(date);
+      start.setHours(0, 0, 0, 0);
+
+      const end = new Date(date);
+      end.setHours(23, 59, 59, 999);
+
+      filter.date = {
+        $gte: start,
+        $lte: end
+      };
+    }
+
+    const attendance = await Attendance.find(filter)
+      .populate("studentId");
+
+    res.json({
+      success: true,
+      attendance
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
+  }
 };
 
-export const getAttendanceByClass = async (req, res) => {
-  const list = await attendanceService.getAttendanceByClass(
-    req.params.classId,
-    req.query.date
-  );
-  res.json(list);
+
+import Attendance from "../models/attendance.model.js";
+import mongoose from "mongoose";
+
+/* ===============================
+   MARK / TOGGLE ATTENDANCE
+================================ */
+
+export const toggleAttendance = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+    const { classId, date } = req.body;
+
+    const resolvedSchoolId =
+      req.user?.schoolId || req.user?.id || req.user?._id;
+
+    const day = new Date(date);
+    day.setHours(0, 0, 0, 0);
+
+    const existing = await Attendance.findOne({
+      studentId,
+      classId,
+      date: day,
+      schoolId: resolvedSchoolId,
+    });
+
+    let record;
+
+    if (existing) {
+      const newStatus =
+        existing.status === "Present" ? "Absent" : "Present";
+
+      existing.status = newStatus;
+      record = await existing.save();
+    } else {
+      record = await Attendance.create({
+        studentId,
+        classId,
+        date: day,
+        status: "Present",
+        schoolId: resolvedSchoolId,
+      });
+    }
+
+    res.json({
+      success: true,
+      attendance: record,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };
+
+/* ===============================
+   GET STUDENT ATTENDANCE
+================================ */
+
+export const getAttendanceByStudent = async (req, res) => {
+  try {
+    const { studentId } = req.params;
+
+    const resolvedSchoolId =
+      req.user?.schoolId || req.user?.id || req.user?._id;
+
+    const data = await Attendance.find({
+      studentId: new mongoose.Types.ObjectId(studentId),
+      schoolId: new mongoose.Types.ObjectId(resolvedSchoolId),
+    }).sort({ date: -1 });
+
+    res.json({
+      success: true,
+      attendance: data,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+

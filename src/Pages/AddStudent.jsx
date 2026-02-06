@@ -5,6 +5,8 @@ import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import CryptoJS from 'crypto-js';
 import FaceRegistrationScanner from "../Components/FaceRegistrationScanner";
+import StudentAttendanceModal from "../Components/StudentAttendanceModal";
+
 
 
 const AddStudentPage = () => {
@@ -29,6 +31,14 @@ const AddStudentPage = () => {
   const [changePass, setChangePass] = useState(false);
   const [openFaceScanner, setOpenFaceScanner] = useState(false);
   const [newStudentId, setNewStudentId] = useState(null);
+
+  const [showAttendance, setShowAttendance] = useState(false);
+  const [attendanceStudent, setAttendanceStudent] = useState(null);
+
+  const [openScanner, setOpenScanner] = useState(false);
+  const [scanClassId, setScanClassId] = useState(null);
+
+
 
   
   const [formData, setFormData] = useState({
@@ -708,6 +718,16 @@ const AddStudentPage = () => {
                     {student.todayStatus === 'Present' ? 'Present' : 'Absent'}
                   </button>
                   <button
+                    onClick={() => {
+                      setAttendanceStudent(student);
+                      setShowAttendance(true);
+                    }}
+                    className="bg-indigo-500 text-white px-4 py-2 rounded-lg font-semibold"
+                  >
+                    Attendance
+                  </button>
+
+                  <button
                     onClick={() => setSelectedStudent(student)}
                     className="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 transition"
                   >
@@ -1144,6 +1164,29 @@ const AddStudentPage = () => {
                 setNewStudentId(null);
               }}
             />
+        )}
+
+        {showAttendance && attendanceStudent && (
+          <StudentAttendanceModal
+            student={attendanceStudent}
+            token={token}
+            onClose={() => {
+              setShowAttendance(false);
+              setAttendanceStudent(null);
+            }}
+          />
+        )}
+
+        {openScanner && scanClassId && (
+          <ClassAttendanceScanner
+            classId={scanClassId}
+            onClose={async () => {
+              setOpenScanner(false);
+              setScanClassId(null);
+
+              await fetchStudents(scanClassId);  
+            }}
+          />
         )}
 
 
