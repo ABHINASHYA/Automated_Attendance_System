@@ -17,7 +17,6 @@
     "@tensorflow/tfjs-backend-webgl": "^4.22.0",
     "@vladmandic/face-api": "^1.7.15",
     "axios": "^1.13.2",
-    "crypto-js": "^4.2.0",
     "emailjs": "^4.0.3",
     "emailjs-com": "^3.2.0",
     "framer-motion": "^12.23.24",

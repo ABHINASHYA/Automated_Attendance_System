@@ -3,50 +3,41 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
-import CryptoJS from "crypto-js";
 
 const Login = () => {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false); // ✅ Added loading state
-  const [error, setError] = useState(""); // ✅ Added error state
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError(""); // ✅ Clear previous errors
-    setLoading(true); // ✅ Set loading to true
-
-    const SECRET_KEY = import.meta.env.VITE_SECRET_KEY;
-
-  if (!SECRET_KEY) {
-    toast.error("Configuration error. Please contact admin.");
-    setLoading(false);
-    return;
-  }
-
-  const encryptedPassword = CryptoJS.AES.encrypt(
-    password,
-    SECRET_KEY
-  ).toString();
-
+    setError("");
+    setLoading(true);
 
     try {
-      const res = await axios.post("https://inclass-dnhc.onrender.com/api/auth/login", {
-        email,
-        password: encryptedPassword,
-      });
+      const res = await axios.post(
+        "https://inclass-dnhc.onrender.com/api/auth/login",
+        {
+          email,
+          password, // ✅ send plain password
+        }
+      );
 
       localStorage.setItem("token", res.data.token);
       toast.success("Login successful!");
       navigate("/AttendancePage");
     } catch (err) {
-      const errorMessage = err.response?.data?.error || "Login failed!";
-      setError(errorMessage); // ✅ Set error state
+      const errorMessage =
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        "Login failed!";
+      setError(errorMessage);
       toast.error(errorMessage);
     } finally {
-      setLoading(false); // ✅ Set loading to false
+      setLoading(false);
     }
   };
 
@@ -60,14 +51,14 @@ const Login = () => {
         animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
         transition={{ repeat: Infinity, duration: 6 }}
         className="absolute w-64 h-64 bg-white/20 rounded-full top-10 left-10 blur-3xl"
-      ></motion.div>
+      />
 
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
         transition={{ repeat: Infinity, duration: 5 }}
         className="absolute w-72 h-72 bg-cyan-300/20 rounded-full bottom-10 right-10 blur-3xl"
-      ></motion.div>
+      />
 
       {/* Login Card */}
       <motion.div
@@ -95,7 +86,6 @@ const Login = () => {
         >
           <input
             type="email"
-            name="email"
             placeholder="Enter your email"
             required
             value={email}
@@ -105,7 +95,6 @@ const Login = () => {
 
           <input
             type="password"
-            name="password"
             placeholder="Enter your password"
             required
             value={password}
@@ -134,10 +123,13 @@ const Login = () => {
           transition={{ delay: 0.6 }}
           className="mt-6 text-gray-100 text-sm"
         >
-          Don't have an account?{" "}
-          <span className="text-blue-800 cursor-pointer hover:underline">
-            <a href="/register">Register</a>
-          </span>
+          Don&apos;t have an account?{" "}
+          <a
+            href="/register"
+            className="text-blue-800 cursor-pointer hover:underline"
+          >
+            Register
+          </a>
         </motion.p>
       </motion.div>
     </div>
