@@ -48,7 +48,7 @@ const ClassAttendanceScanner = ({ classId, token, onClose }) => {
 
         // 4. load only students of this class
         const res = await axios.get(
-          `http://localhost:3000/api/student/class/${classId}`,
+          `https://inclass-dnhc.onrender.com/api/student/class/${classId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -121,7 +121,7 @@ const ClassAttendanceScanner = ({ classId, token, onClose }) => {
       const today = new Date().toISOString().split("T")[0];
 
       await axios.put(
-        `http://localhost:3000/api/attendance/toggle/${bestStudent._id}`,
+        `https://inclass-dnhc.onrender.com/api/attendance/toggle/${bestStudent._id}`,
         { classId, date: today },
         { headers: { Authorization: `Bearer ${token}` } }
       );

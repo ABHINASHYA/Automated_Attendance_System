@@ -56,7 +56,7 @@ const AttendancePage = () => {
     }
 
     axios
-      .get("http://localhost:3000/api/auth/profile", {
+      .get("https://inclass-dnhc.onrender.com/api/auth/profile", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -76,8 +76,8 @@ const AttendancePage = () => {
     try {
       const url =
         userdata.role === "Principal"
-          ? "http://localhost:3000/api/class/school-classes"
-          : "http://localhost:3000/api/class/my-classes";
+          ? "https://inclass-dnhc.onrender.com/api/class/school-classes"
+          : "https://inclass-dnhc.onrender.com/api/class/my-classes";
 
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
@@ -107,7 +107,7 @@ const AttendancePage = () => {
     const token = localStorage.getItem("token");
     try {
       await axios.put(
-        "http://localhost:3000/api/auth/update-profile",
+        "https://inclass-dnhc.onrender.com/api/auth/update-profile",
         profileData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -141,7 +141,7 @@ const AttendancePage = () => {
 
     try {
       const res = await axios.put(
-        "http://localhost:3000/api/auth/change-password",
+        "https://inclass-dnhc.onrender.com/api/auth/change-password",
         {
           oldPassword: encryptedOld,
           newPassword: encryptedNew,
@@ -208,7 +208,7 @@ const AttendancePage = () => {
     try {
       if (editingClass) {
         await axios.put(
-          `http://localhost:3000/api/class/${editingClass._id}`,
+          `https://inclass-dnhc.onrender.com/api/class/${editingClass._id}`,
           formData,
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -216,7 +216,7 @@ const AttendancePage = () => {
         );
         toast.success("Class updated!");
       } else {
-        await axios.post("http://localhost:3000/api/class/create", formData, {
+        await axios.post("https://inclass-dnhc.onrender.com/api/class/create", formData, {
           headers: { Authorization: `Bearer ${token}` },
         });
         toast.success("Class added!");
@@ -245,7 +245,7 @@ const AttendancePage = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`http://localhost:3000/api/class/${cls._id}`, {
+      await axios.delete(`https://inclass-dnhc.onrender.com/api/class/${cls._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -475,11 +475,11 @@ const AttendancePage = () => {
                     onClick={() => {
                       setScanClassId(cls._id);
                       setOpenScanner(true);
-                      }}
-                      className="bg-green-500 text-white px-4 py-2 rounded-lg hover:cursor-pointer"
-                    >
-                          Scanner
-                    </button>
+                    }}
+                    className="bg-green-500 text-white px-4 py-2 rounded-lg hover:cursor-pointer"
+                  >
+                    Scanner
+                  </button>
 
                   <button
                     onClick={() => openEditClassModal(cls)}
@@ -762,16 +762,16 @@ const AttendancePage = () => {
           </>
         )}
       </AnimatePresence>
-        {openScanner && scanClassId && (
-          <ClassAttendanceScanner
-            classId={scanClassId}
-            token={token}
-            onClose={() => {
-              setOpenScanner(false);
-              setScanClassId(null);
-            }}
-          />
-        )}
+      {openScanner && scanClassId && (
+        <ClassAttendanceScanner
+          classId={scanClassId}
+          token={token}
+          onClose={() => {
+            setOpenScanner(false);
+            setScanClassId(null);
+          }}
+        />
+      )}
 
     </div>
   );

@@ -43,7 +43,7 @@ const Register = () => {
         import.meta.env.VITE_SECRET_KEY
       ).toString();
 
-      await axios.post("http://localhost:3000/api/auth/register", {
+      await axios.post("https://inclass-dnhc.onrender.com/api/auth/register", {
         fullName: formData.fullName,
         email: formData.email,
         password: encryptedPassword, // ✅ FIXED: was formData.encryptedPassword
@@ -134,9 +134,8 @@ const Register = () => {
             required
             value={formData.confirmPassword}
             onChange={handleChange}
-            className={`p-3 rounded-lg bg-white/20 text-white placeholder-gray-200 outline-none focus:ring-2 ${
-              error ? "ring-red-500" : "focus:ring-cyan-400"
-            }`}
+            className={`p-3 rounded-lg bg-white/20 text-white placeholder-gray-200 outline-none focus:ring-2 ${error ? "ring-red-500" : "focus:ring-cyan-400"
+              }`}
           />
 
           {/* Error */}

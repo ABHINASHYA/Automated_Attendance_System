@@ -76,7 +76,7 @@ const AutoAttendanceScanner = ({ classId, token, onClose }) => {
 	const markAttendance = async () => {
 		try {
 			await axios.post(
-				"http://localhost:3000/api/attendance/mark",
+				"https://inclass-dnhc.onrender.com/api/attendance/mark",
 				{ classId },
 				{ headers: { Authorization: `Bearer ${token}` } }
 			);

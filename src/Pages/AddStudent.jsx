@@ -79,7 +79,7 @@ const AddStudentPage = () => {
     try {
       console.log('👥 Fetching students for class:', cid);
       const res = await axios.get(
-        `http://localhost:3000/api/student/class/${cid}`,
+        `https://inclass-dnhc.onrender.com/api/student/class/${cid}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -95,7 +95,7 @@ const AddStudentPage = () => {
       let attendanceList = [];
       try {
         const attendanceRes = await axios.get(
-          `http://localhost:3000/api/attendance/class/${cid}?date=${today}`,
+          `https://inclass-dnhc.onrender.com/api/attendance/class/${cid}?date=${today}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         attendanceList = attendanceRes.data.attendance || attendanceRes.data || [];
@@ -139,7 +139,7 @@ const AddStudentPage = () => {
 
     const fetchUserProfile = async () => {
       try {
-        const res = await axios.get('http://localhost:3000/api/auth/profile', {
+        const res = await axios.get('https://inclass-dnhc.onrender.com/api/auth/profile', {
           headers: { Authorization: `Bearer ${token}` },
         });
         console.log('👤 User profile:', res.data.user);
@@ -164,7 +164,7 @@ const AddStudentPage = () => {
 
     const fetchClasses = async () => {
       try {
-        const res = await axios.get('http://localhost:3000/api/class/my-classes', {
+        const res = await axios.get('https://inclass-dnhc.onrender.com/api/class/my-classes', {
           headers: { Authorization: `Bearer ${token}` },
         });
         const returned = res.data.classes || res.data || [];
@@ -199,7 +199,7 @@ const AddStudentPage = () => {
         // Fetch class details
         try {
           const classRes = await axios.get(
-            `http://localhost:3000/api/class/${activeClassId}`,
+            `https://inclass-dnhc.onrender.com/api/class/${activeClassId}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
           console.log('📖 Class data:', classRes.data);
@@ -309,7 +309,7 @@ const AddStudentPage = () => {
       if (editingStudent) {
         // Update existing student
         const response = await axios.put(
-          `http://localhost:3000/api/student/${editingStudent._id}`,
+          `https://inclass-dnhc.onrender.com/api/student/${editingStudent._id}`,
           studentData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -318,7 +318,7 @@ const AddStudentPage = () => {
       } else {
         // Create new student
         const response = await axios.post(
-          'http://localhost:3000/api/student/create',
+          'https://inclass-dnhc.onrender.com/api/student/create',
           studentData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -361,7 +361,7 @@ const AddStudentPage = () => {
 
     try {
       await axios.delete(
-        `http://localhost:3000/api/student/${studentId}`,
+        `https://inclass-dnhc.onrender.com/api/student/${studentId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       toast.success('Student deleted successfully!');
@@ -378,7 +378,7 @@ const AddStudentPage = () => {
       const today = new Date().toISOString().split('T')[0];
       
       const res = await axios.put(
-        `http://localhost:3000/api/attendance/toggle/${studentId}`,
+        `https://inclass-dnhc.onrender.com/api/attendance/toggle/${studentId}`,
         { classId: activeClassId, date: today },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -460,7 +460,7 @@ const AddStudentPage = () => {
   const handleUpdateProfile = async () => {
     try {
       await axios.put(
-        'http://localhost:3000/api/auth/update-profile',
+        'https://inclass-dnhc.onrender.com/api/auth/update-profile',
         profileData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -492,7 +492,7 @@ const AddStudentPage = () => {
 
     try {
       const res = await axios.put(
-        'http://localhost:3000/api/auth/change-password',
+        'https://inclass-dnhc.onrender.com/api/auth/change-password',
         {
           oldPassword: encryptedOld,
           newPassword: encryptedNew,
