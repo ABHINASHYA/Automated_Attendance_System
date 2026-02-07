@@ -4,7 +4,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
-import CryptoJS from "crypto-js";
 import ClassAttendanceScanner from "../Components/ClassAttendanceScanner";
 
 
@@ -122,7 +121,8 @@ const AttendancePage = () => {
     }
   };
 
-  // ================= CHANGE PASSWORD (with AES encryption) =================
+  // ================= CHANGE PASSWORD  =================
+
   const handlePasswordUpdate = async () => {
     const token = localStorage.getItem("token");
 
@@ -130,21 +130,12 @@ const AttendancePage = () => {
       return toast.error("Both fields are required!");
     }
 
-    const encryptedOld = CryptoJS.AES.encrypt(
-      passwords.oldPassword,
-      import.meta.env.VITE_SECRET_KEY
-    ).toString();
-    const encryptedNew = CryptoJS.AES.encrypt(
-      passwords.newPassword,
-      import.meta.env.VITE_SECRET_KEY
-    ).toString();
-
     try {
       const res = await axios.put(
         "https://inclass-dnhc.onrender.com/api/auth/change-password",
         {
-          oldPassword: encryptedOld,
-          newPassword: encryptedNew,
+          oldPassword: passwords.oldPassword, // ✅ plain password
+          newPassword: passwords.newPassword, // ✅ plain password
         },
         {
           headers: { Authorization: `Bearer ${token}` },
