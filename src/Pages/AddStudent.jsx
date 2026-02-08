@@ -373,37 +373,26 @@ const AddStudentPage = () => {
   };
 
   // ================= TOGGLE ATTENDANCE =================
-  const toggleAttendance = async (studentId, currentStatus) => {
-    try {
-      const today = new Date().toISOString().split('T')[0];
-      
-      const res = await axios.put(
-        `http://localhost:3000/api/attendance/toggle/${studentId}`,
-        { classId: activeClassId, date: today },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+    const toggleAttendance = async (studentId) => {
+      try {
+        const today = new Date().toISOString().split("T")[0];
 
-      console.log('✅ Attendance toggled:', res.data);
+        await axios.put(
+          `http://localhost:3000/api/attendance/toggle/${studentId}`,
+          { classId: activeClassId, date: today },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
 
-      // Update local state
-      const newStatus = currentStatus === 'Present' ? 'Absent' : 'Present';
-      setStudents(prev => prev.map(student => 
-        student._id === studentId 
-          ? { ...student, todayStatus: newStatus }
-          : student
-      ));
-      setFilteredStudents(prev => prev.map(student => 
-        student._id === studentId 
-          ? { ...student, todayStatus: newStatus }
-          : student
-      ));
+        // ✅ always refresh from server (no local flip logic)
+        await fetchStudents(activeClassId);
 
-      toast.success('Attendance updated!');
-    } catch (err) {
-      console.error('Attendance toggle error:', err);
-      toast.error(err.response?.data?.error || 'Failed to update attendance!');
-    }
-  };
+        toast.success("Attendance updated!");
+      } catch (err) {
+        console.error("Attendance toggle error:", err);
+        toast.error(err.response?.data?.error || "Failed to update attendance!");
+      }
+    };
+
 
   // ================= SEARCH =================
   const handleSearch = (text) => {
@@ -638,7 +627,7 @@ const AddStudentPage = () => {
             whileFocus={{ scale: 1.01 }}
             type="text"
             placeholder="Search by name, roll no, or email..."
-            className="p-3 rounded-xl border border-gray-300 outline-none text-gray-800 shadow-sm"
+            className="p-3 rounded-xl border border-gray-300 outline-none text-white shadow-sm"
             onChange={(e) => handleSearch(e.target.value)}
           />
           <div className="flex flex-wrap gap-2 text-sm">

@@ -13,15 +13,25 @@ export const createClass = async (req, res) => {
       section: req.body.section,
       subject: req.body.subject,
       teacherId: req.user._id,
-      schoolName: req.user.schoolName,
+
+      schoolId: req.user._id,        
+      schoolName: req.user.schoolName
     };
 
+    // console.log("USER =>", req.user);
+
     const createdClass = await createClassService(classData);
-    res.status(200).json({ message: "Class created", class: createdClass });
+
+    res.status(200).json({
+      message: "Class created",
+      class: createdClass
+    });
+
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 };
+
 
 export const getMyClasses = async (req, res) => {
   try {

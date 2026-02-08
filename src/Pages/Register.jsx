@@ -163,9 +163,9 @@ const Register = () => {
             onChange={handleChange}
             className="p-3 rounded-lg bg-white/20 text-white outline-none focus:ring-2 focus:ring-cyan-400"
           >
-            <option value="">Select Role</option>
-            <option value="Principal">Principal</option>
-            <option value="Teacher">Teacher</option>
+            <option value="" className="bg-blue-400">Select Role</option>
+            <option value="Principal" className="bg-blue-400">Principal</option>
+            <option value="Teacher" className="bg-blue-400">Teacher</option>
           </select>
 
           {/* Subject */}

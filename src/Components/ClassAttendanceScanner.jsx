@@ -17,6 +17,9 @@ const ClassAttendanceScanner = ({ classId, token, onClose }) => {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
 
+  // ✅ prevent duplicate marking
+  const markedRef = useRef(new Set());
+
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [scanning, setScanning] = useState(false);
@@ -26,7 +29,7 @@ const ClassAttendanceScanner = ({ classId, token, onClose }) => {
 
     const init = async () => {
       try {
-        // 1. open camera FIRST (important)
+
         const stream = await navigator.mediaDevices.getUserMedia({
           video: { facingMode: "user" }
         });
@@ -37,16 +40,13 @@ const ClassAttendanceScanner = ({ classId, token, onClose }) => {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
 
-        // 2. init tf
         await faceapi.tf.setBackend("webgl");
         await faceapi.tf.ready();
 
-        // 3. load models
         await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
         await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
         await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
 
-        // 4. load only students of this class
         const res = await axios.get(
           `http://localhost:3000/api/student/class/${classId}`,
           { headers: { Authorization: `Bearer ${token}` } }
@@ -77,10 +77,8 @@ const ClassAttendanceScanner = ({ classId, token, onClose }) => {
   }, [classId, token]);
 
   const scanAndMark = async () => {
-    if (!students.length) {
-      toast.error("No registered faces in this class");
-      return;
-    }
+    if (!students.length) return;
+    if (scanning) return;
 
     try {
       setScanning(true);
@@ -94,7 +92,6 @@ const ClassAttendanceScanner = ({ classId, token, onClose }) => {
         .withFaceDescriptor();
 
       if (!detection) {
-        toast.error("Face not detected");
         setScanning(false);
         return;
       }
@@ -113,16 +110,27 @@ const ClassAttendanceScanner = ({ classId, token, onClose }) => {
       }
 
       if (!bestStudent || bestDistance > 0.55) {
-        toast.error("Face not recognized");
         setScanning(false);
         return;
       }
 
+      // ✅ already marked in this session
+      if (markedRef.current.has(bestStudent._id)) {
+        setScanning(false);
+        return;
+      }
+
+      markedRef.current.add(bestStudent._id);
+
       const today = new Date().toISOString().split("T")[0];
 
-      await axios.put(
-        `http://localhost:3000/api/attendance/toggle/${bestStudent._id}`,
-        { classId, date: today },
+      await axios.post(
+        "http://localhost:3000/api/attendance/mark-present",
+        {
+          studentId: bestStudent._id,
+          classId,
+          date: today
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -132,15 +140,25 @@ const ClassAttendanceScanner = ({ classId, token, onClose }) => {
 
     } catch (err) {
       console.error(err);
-      toast.error("Scan failed");
       setScanning(false);
     }
   };
 
+  // ✅ auto scan when scanner opens
+  useEffect(() => {
+    if (loading) return;
+
+    const interval = setInterval(() => {
+      scanAndMark();
+    }, 2500);
+
+    return () => clearInterval(interval);
+
+  }, [loading, students]);
+
   return (
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
 
-      {/* ✅ SMALL CENTER POPUP */}
       <div className="bg-white rounded-2xl p-4 w-[360px] shadow-2xl flex flex-col items-center">
 
         <h3 className="font-semibold text-lg mb-2">
@@ -166,7 +184,7 @@ const ClassAttendanceScanner = ({ classId, token, onClose }) => {
           onClick={scanAndMark}
           className="mt-4 bg-green-600 text-white px-6 py-2 rounded-lg font-semibold disabled:opacity-50"
         >
-          {scanning ? "Scanning..." : "Scan & Mark"}
+          {scanning ? "Scanning..." : "Scan now"}
         </button>
 
         <button

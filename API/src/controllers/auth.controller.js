@@ -104,3 +104,41 @@ export const removeTeacher = async (req, res) => {
         res.status(400).json({ error: err.message });
     }
 };
+
+
+
+
+// for profile update
+
+
+import User from "../models/user.model.js";
+
+export const updateProfile = async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const { fullName, email, schoolName, gender } = req.body;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        fullName,
+        email,
+        schoolName,
+        gender
+      },
+      { new: true }
+    ).select("-password");
+
+    res.json({
+      success: true,
+      message: "Profile updated successfully",
+      user: updatedUser
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      error: err.message
+    });
+  }
+};

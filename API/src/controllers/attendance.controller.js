@@ -125,3 +125,63 @@ export const getAttendanceByStudent = async (req, res) => {
   }
 };
 
+
+
+
+
+
+export const markPresentByFace = async (req, res) => {
+  try {
+    const { studentId, classId, date } = req.body;
+
+    const resolvedSchoolId =
+      req.user?.schoolId || req.user?._id;
+
+    const day = new Date(date);
+    day.setHours(0, 0, 0, 0);
+
+    const existing = await Attendance.findOne({
+      studentId,
+      classId,
+      schoolId: resolvedSchoolId,
+      date: day
+    });
+
+    // ✅ already present → do nothing
+    if (existing && existing.status === "Present") {
+      return res.json({
+        success: true,
+        alreadyMarked: true,
+        attendance: existing
+      });
+    }
+
+    // ❌ exists but absent
+    if (existing) {
+      existing.status = "Present";
+      await existing.save();
+
+      return res.json({
+        success: true,
+        attendance: existing
+      });
+    }
+
+    // ❌ no record yet
+    const record = await Attendance.create({
+      studentId,
+      classId,
+      schoolId: resolvedSchoolId,
+      date: day,
+      status: "Present"
+    });
+
+    res.json({
+      success: true,
+      attendance: record
+    });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
