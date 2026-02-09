@@ -76,7 +76,7 @@ const FaceRegistrationScanner = ({ studentId, token, onClose }) => {
       const descriptor = Array.from(detection.descriptor);
 
       await axios.put(
-        `http://localhost:3000/api/student/${studentId}/update-face`,
+        `https://inclass-dnhc.onrender.com/api/student/${studentId}/update-face`,
         { descriptor },
         { headers: { Authorization: `Bearer ${token}` } }
       );

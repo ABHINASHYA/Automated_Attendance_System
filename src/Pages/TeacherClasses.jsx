@@ -27,7 +27,7 @@ const TeacherClasses = () => {
     const fetchClasses = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:3000/api/class/teacher-classes/${id}`,
+          `https://inclass-dnhc.onrender.com/api/class/teacher-classes/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }

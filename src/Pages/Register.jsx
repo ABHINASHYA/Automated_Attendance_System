@@ -39,7 +39,7 @@ const Register = () => {
 
       const encryptedPassword = formData.password;
 
-      await axios.post("http://localhost:3000/api/auth/register", {
+      await axios.post("https://inclass-dnhc.onrender.com/api/auth/register", {
         fullName: formData.fullName,
         email: formData.email,
         password: encryptedPassword, // ✅ FIXED: was formData.encryptedPassword

@@ -48,7 +48,7 @@ const ClassAttendanceScanner = ({ classId, token, onClose }) => {
         await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
 
         const res = await axios.get(
-          `http://localhost:3000/api/student/class/${classId}`,
+          `https://inclass-dnhc.onrender.com/api/student/class/${classId}`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
 
@@ -125,7 +125,7 @@ const ClassAttendanceScanner = ({ classId, token, onClose }) => {
       const today = new Date().toISOString().split("T")[0];
 
       await axios.post(
-        "http://localhost:3000/api/attendance/mark-present",
+        "https://inclass-dnhc.onrender.com/api/attendance/mark-present",
         {
           studentId: bestStudent._id,
           classId,

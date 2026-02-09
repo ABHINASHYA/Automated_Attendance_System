@@ -13,7 +13,7 @@ const StudentAttendanceModal = ({ student, onClose }) => {
     const load = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:3000/api/attendance/student/${student._id}`,
+          `https://inclass-dnhc.onrender.com/api/attendance/student/${student._id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

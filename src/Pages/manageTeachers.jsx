@@ -21,10 +21,10 @@ const ManageTeachers = () => {
     const fetchData = async () => {
       try {
         const [profileRes, teachersRes] = await Promise.all([
-          axios.get("http://localhost:3000/api/auth/profile", {
+          axios.get("https://inclass-dnhc.onrender.com/api/auth/profile", {
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("http://localhost:3000/api/auth/get-all-teachers", {
+          axios.get("https://inclass-dnhc.onrender.com/api/auth/get-all-teachers", {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -44,7 +44,7 @@ const ManageTeachers = () => {
     const token = localStorage.getItem("token");
     try {
       await axios.put(
-        `http://localhost:3000/api/auth/update-teacher-status/${id}`,
+        `https://inclass-dnhc.onrender.com/api/auth/update-teacher-status/${id}`,
         { status },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -63,7 +63,7 @@ const ManageTeachers = () => {
     const token = localStorage.getItem("token");
     try {
       await axios.delete(
-        `http://localhost:3000/api/auth/remove-teacher/${id}`,
+        `https://inclass-dnhc.onrender.com/api/auth/remove-teacher/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
