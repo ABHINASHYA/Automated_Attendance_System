@@ -4,7 +4,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
-import CryptoJS from "crypto-js";
 import ClassAttendanceScanner from "../Components/ClassAttendanceScanner";
 
 
@@ -123,31 +122,22 @@ const AttendancePage = () => {
   };
 
   // ================= CHANGE PASSWORD (with AES encryption) =================
-  const handlePasswordUpdate = async () => {
+    const handlePasswordUpdate = async () => {
     const token = localStorage.getItem("token");
 
     if (!passwords.oldPassword || !passwords.newPassword) {
       return toast.error("Both fields are required!");
     }
 
-    const encryptedOld = CryptoJS.AES.encrypt(
-      passwords.oldPassword,
-      import.meta.env.VITE_SECRET_KEY
-    ).toString();
-    const encryptedNew = CryptoJS.AES.encrypt(
-      passwords.newPassword,
-      import.meta.env.VITE_SECRET_KEY
-    ).toString();
-
     try {
       const res = await axios.put(
         "http://localhost:3000/api/auth/change-password",
         {
-          oldPassword: encryptedOld,
-          newPassword: encryptedNew,
+          oldPassword: passwords.oldPassword,
+          newPassword: passwords.newPassword
         },
         {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${token}` }
         }
       );
 
@@ -159,6 +149,7 @@ const AttendancePage = () => {
       toast.error(msg);
     }
   };
+
 
   // ================= CLASS FORM HANDLERS =================
   const handleChangeClass = (e) => {

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
-import CryptoJS from "crypto-js";
 import toast, { Toaster } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -38,10 +37,7 @@ const Register = () => {
     try {
       setLoading(true);
 
-      const encryptedPassword = CryptoJS.AES.encrypt(
-        formData.password,
-        import.meta.env.VITE_SECRET_KEY
-      ).toString();
+      const encryptedPassword = formData.password;
 
       await axios.post("http://localhost:3000/api/auth/register", {
         fullName: formData.fullName,

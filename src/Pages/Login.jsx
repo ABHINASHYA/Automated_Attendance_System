@@ -3,7 +3,6 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
-import CryptoJS from "crypto-js";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -18,10 +17,7 @@ const Login = () => {
     setError(""); // ✅ Clear previous errors
     setLoading(true); // ✅ Set loading to true
 
-    const encryptedPassword = CryptoJS.AES.encrypt(
-      password,
-      import.meta.env.VITE_SECRET_KEY
-    ).toString();
+    const encryptedPassword = password;
 
     try {
       const res = await axios.post("http://localhost:3000/api/auth/login", {

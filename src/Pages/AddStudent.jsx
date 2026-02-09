@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
-import CryptoJS from 'crypto-js';
 import FaceRegistrationScanner from "../Components/FaceRegistrationScanner";
 import StudentAttendanceModal from "../Components/StudentAttendanceModal";
 
@@ -465,40 +464,32 @@ const AddStudentPage = () => {
   };
 
   // ================= CHANGE PASSWORD =================
-  const handlePasswordUpdate = async () => {
-    if (!passwords.oldPassword || !passwords.newPassword) {
-      return toast.error('Both fields are required!');
-    }
+ const handlePasswordUpdate = async () => {
+  if (!passwords.oldPassword || !passwords.newPassword) {
+    return toast.error("Both fields are required!");
+  }
 
-    const encryptedOld = CryptoJS.AES.encrypt(
-      passwords.oldPassword,
-      import.meta.env.VITE_SECRET_KEY
-    ).toString();
-    const encryptedNew = CryptoJS.AES.encrypt(
-      passwords.newPassword,
-      import.meta.env.VITE_SECRET_KEY
-    ).toString();
+  try {
+    const res = await axios.put(
+      "http://localhost:3000/api/auth/change-password",
+      {
+        oldPassword: passwords.oldPassword,
+        newPassword: passwords.newPassword
+      },
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    );
 
-    try {
-      const res = await axios.put(
-        'http://localhost:3000/api/auth/change-password',
-        {
-          oldPassword: encryptedOld,
-          newPassword: encryptedNew,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+    toast.success(res.data.message || "Password changed successfully!");
+    setPasswords({ oldPassword: "", newPassword: "" });
+    setChangePass(false);
+  } catch (err) {
+    const msg = err.response?.data?.error || "Password change failed!";
+    toast.error(msg);
+  }
+};
 
-      toast.success(res.data.message || 'Password changed successfully!');
-      setPasswords({ oldPassword: '', newPassword: '' });
-      setChangePass(false);
-    } catch (err) {
-      const msg = err.response?.data?.error || 'Password change failed!';
-      toast.error(msg);
-    }
-  };
 
   if (loading) {
     return (
