@@ -149,7 +149,6 @@ export const updateTeacherStatusService = async (id, status) => {
   return { message: "Status updated", teacher };
 };
 
-
 export const removeTeacherService = async (id) => {
   const teacher = await User.findById(id);
   if (!teacher) throw new Error("Teacher not found");

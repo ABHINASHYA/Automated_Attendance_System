@@ -52,7 +52,11 @@ const Register = () => {
       toast.success("Registration successful!");
       navigate("/login");
     } catch (err) {
-      toast.error(err.response?.data?.error || "Registration failed");
+      toast.error(
+        err.response?.data?.error ||
+        err.response?.data?.message ||
+        "Registration failed"
+      );
     } finally {
       setLoading(false);
     }
@@ -68,14 +72,14 @@ const Register = () => {
         animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
         transition={{ repeat: Infinity, duration: 6 }}
         className="absolute w-64 h-64 bg-white/20 rounded-full top-10 left-10 blur-3xl"
-      ></motion.div>
+      />
 
       <motion.div
         initial={{ scale: 0 }}
         animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
         transition={{ repeat: Infinity, duration: 5 }}
         className="absolute w-72 h-72 bg-cyan-300/20 rounded-full bottom-10 right-10 blur-3xl"
-      ></motion.div>
+      />
 
       {/* Register Form */}
       <motion.div
@@ -89,7 +93,6 @@ const Register = () => {
         </h2>
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-          {/* Name */}
           <input
             type="text"
             name="fullName"
@@ -100,7 +103,6 @@ const Register = () => {
             className="p-3 rounded-lg bg-white/20 text-white placeholder-gray-200 outline-none focus:ring-2 focus:ring-cyan-400"
           />
 
-          {/* Email */}
           <input
             type="email"
             name="email"
@@ -111,7 +113,6 @@ const Register = () => {
             className="p-3 rounded-lg bg-white/20 text-white placeholder-gray-200 outline-none focus:ring-2 focus:ring-cyan-400"
           />
 
-          {/* Password */}
           <input
             type="password"
             name="password"
@@ -122,7 +123,6 @@ const Register = () => {
             className="p-3 rounded-lg bg-white/20 text-white placeholder-gray-200 outline-none focus:ring-2 focus:ring-cyan-400"
           />
 
-          {/* Confirm Password */}
           <input
             type="password"
             name="confirmPassword"
@@ -130,17 +130,14 @@ const Register = () => {
             required
             value={formData.confirmPassword}
             onChange={handleChange}
-            className={`p-3 rounded-lg bg-white/20 text-white placeholder-gray-200 outline-none focus:ring-2 ${
-              error ? "ring-red-500" : "focus:ring-cyan-400"
-            }`}
+            className={`p-3 rounded-lg bg-white/20 text-white placeholder-gray-200 outline-none focus:ring-2 ${error ? "ring-red-500" : "focus:ring-cyan-400"
+              }`}
           />
 
-          {/* Error */}
           {error && (
             <p className="text-red-400 text-sm text-center -mt-2">{error}</p>
           )}
 
-          {/* School Name */}
           <input
             type="text"
             name="schoolName"
@@ -151,7 +148,6 @@ const Register = () => {
             className="p-3 rounded-lg bg-white/20 text-white placeholder-gray-200 outline-none focus:ring-2 focus:ring-cyan-400"
           />
 
-          {/* Role */}
           <select
             name="role"
             required
@@ -164,7 +160,6 @@ const Register = () => {
             <option value="Teacher" className="bg-blue-400">Teacher</option>
           </select>
 
-          {/* Subject */}
           <input
             type="text"
             name="subjectName"
@@ -175,13 +170,9 @@ const Register = () => {
             className="p-3 rounded-lg bg-white/20 text-white placeholder-gray-200 outline-none focus:ring-2 focus:ring-cyan-400"
           />
 
-          {/* Gender */}
           <div className="flex justify-center gap-6 mt-2 text-gray-200">
             {["Male", "Female", "Other"].map((g) => (
-              <label
-                key={g}
-                className="flex items-center gap-2 cursor-pointer"
-              >
+              <label key={g} className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="radio"
                   name="gender"
@@ -195,7 +186,6 @@ const Register = () => {
             ))}
           </div>
 
-          {/* Submit */}
           <motion.button
             whileHover={{ scale: loading ? 1 : 1.05 }}
             whileTap={{ scale: loading ? 1 : 0.95 }}

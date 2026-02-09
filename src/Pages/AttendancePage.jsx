@@ -466,11 +466,11 @@ const AttendancePage = () => {
                     onClick={() => {
                       setScanClassId(cls._id);
                       setOpenScanner(true);
-                      }}
-                      className="bg-green-500 text-white px-4 py-2 rounded-lg hover:cursor-pointer"
-                    >
-                          Scanner
-                    </button>
+                    }}
+                    className="bg-green-500 text-white px-4 py-2 rounded-lg hover:cursor-pointer"
+                  >
+                    Scanner
+                  </button>
 
                   <button
                     onClick={() => openEditClassModal(cls)}
@@ -753,16 +753,16 @@ const AttendancePage = () => {
           </>
         )}
       </AnimatePresence>
-        {openScanner && scanClassId && (
-          <ClassAttendanceScanner
-            classId={scanClassId}
-            token={token}
-            onClose={() => {
-              setOpenScanner(false);
-              setScanClassId(null);
-            }}
-          />
-        )}
+      {openScanner && scanClassId && (
+        <ClassAttendanceScanner
+          classId={scanClassId}
+          token={token}
+          onClose={() => {
+            setOpenScanner(false);
+            setScanClassId(null);
+          }}
+        />
+      )}
 
     </div>
   );

@@ -20,11 +20,11 @@ const AddStudentPage = () => {
   const [students, setStudents] = useState([]);
   const [filteredStudents, setFilteredStudents] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
   const [selectedStudent, setSelectedStudent] = useState(null);
-  
+
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [profileEdit, setProfileEdit] = useState(false);
   const [changePass, setChangePass] = useState(false);
@@ -39,7 +39,7 @@ const AddStudentPage = () => {
 
 
 
-  
+
   const [formData, setFormData] = useState({
     name: '',
     fatherName: '',
@@ -169,7 +169,7 @@ const AddStudentPage = () => {
         const returned = res.data.classes || res.data || [];
         const normalized = (Array.isArray(returned) ? returned : []).filter(c => c && (c._id || c.id));
         setClasses(normalized);
-        
+
         // If no classId in URL and we have classes, pick the first
         if (!activeClassId && normalized.length > 0) {
           const firstClassId = String(normalized[0]._id || normalized[0].id);
@@ -205,10 +205,10 @@ const AddStudentPage = () => {
           setClassData(classRes.data.class || classRes.data);
         } catch (err) {
           console.log('Class details API not found, using default');
-          setClassData({ 
-            className: 'Class', 
-            section: 'Section', 
-            subject: 'Subject' 
+          setClassData({
+            className: 'Class',
+            section: 'Section',
+            subject: 'Subject'
           });
         }
 
@@ -229,9 +229,9 @@ const AddStudentPage = () => {
   const generateRollNo = () => {
     const maxRollNo = students.length > 0
       ? Math.max(...students.map(s => {
-          const n = parseInt(s.rollNo, 10);
-          return Number.isNaN(n) ? 0 : n;
-        }))
+        const n = parseInt(s.rollNo, 10);
+        return Number.isNaN(n) ? 0 : n;
+      }))
       : 0;
     return String(maxRollNo + 1);
   };
@@ -276,8 +276,8 @@ const AddStudentPage = () => {
     e.preventDefault();
 
     // Validate all fields
-    if (!formData.name || !formData.fatherName || !formData.dateOfBirth || 
-        !formData.address || !formData.contact || !formData.email || !formData.rollNo) {
+    if (!formData.name || !formData.fatherName || !formData.dateOfBirth ||
+      !formData.address || !formData.contact || !formData.email || !formData.rollNo) {
       toast.error('All fields are required!');
       return;
     }
@@ -343,7 +343,7 @@ const AddStudentPage = () => {
         gender: 'Male',
         rollNo: ''
       });
-      
+
       await fetchStudents(activeClassId);
     } catch (err) {
       console.error('Error:', err);
@@ -396,7 +396,7 @@ const AddStudentPage = () => {
   // ================= SEARCH =================
   const handleSearch = (text) => {
     const query = text.toLowerCase();
-    const filtered = students.filter((student) => 
+    const filtered = students.filter((student) =>
       student.name.toLowerCase().includes(query) ||
       student.rollNo.toString().includes(query) ||
       student.email.toLowerCase().includes(query)
@@ -406,25 +406,25 @@ const AddStudentPage = () => {
 
   // ================= SORT FUNCTIONS =================
   const sortByRollNo = () => {
-    setFilteredStudents([...filteredStudents].sort((a, b) => 
+    setFilteredStudents([...filteredStudents].sort((a, b) =>
       parseInt(a.rollNo) - parseInt(b.rollNo)
     ));
   };
 
   const sortByName = () => {
-    setFilteredStudents([...filteredStudents].sort((a, b) => 
+    setFilteredStudents([...filteredStudents].sort((a, b) =>
       a.name.localeCompare(b.name)
     ));
   };
 
   const sortByPresent = () => {
-    setFilteredStudents([...filteredStudents].sort((a, b) => 
+    setFilteredStudents([...filteredStudents].sort((a, b) =>
       (b.todayStatus === 'Present' ? 1 : 0) - (a.todayStatus === 'Present' ? 1 : 0)
     ));
   };
 
   const sortByAbsent = () => {
-    setFilteredStudents([...filteredStudents].sort((a, b) => 
+    setFilteredStudents([...filteredStudents].sort((a, b) =>
       (b.todayStatus === 'Absent' ? 1 : 0) - (a.todayStatus === 'Absent' ? 1 : 0)
     ));
   };
@@ -489,6 +489,9 @@ const AddStudentPage = () => {
     toast.error(msg);
   }
 };
+
+
+
 
 
   if (loading) {
@@ -677,7 +680,7 @@ const AddStudentPage = () => {
                     </span>
                     <p className="text-lg font-semibold">{student.name}</p>
                   </div>
-                  
+
                   <p className="text-sm text-gray-600 mt-2">
                     Father: {student.fatherName}
                   </p>
@@ -689,11 +692,10 @@ const AddStudentPage = () => {
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={() => toggleAttendance(student._id, student.todayStatus || 'Absent')}
-                    className={`px-4 py-2 rounded-lg font-semibold transition ${
-                      student.todayStatus === 'Present'
-                        ? 'bg-green-500 text-white hover:bg-green-600'
-                        : 'bg-red-500 text-white hover:bg-red-600'
-                    }`}
+                    className={`px-4 py-2 rounded-lg font-semibold transition ${student.todayStatus === 'Present'
+                      ? 'bg-green-500 text-white hover:bg-green-600'
+                      : 'bg-red-500 text-white hover:bg-red-600'
+                      }`}
                   >
                     {student.todayStatus === 'Present' ? 'Present' : 'Absent'}
                   </button>
@@ -928,9 +930,8 @@ const AddStudentPage = () => {
                   </div>
                   <div className="flex pt-2">
                     <span className="font-semibold text-gray-700 w-36">Today's Status:</span>
-                    <span className={`font-bold flex-1 ${
-                      selectedStudent.todayStatus === 'Present' ? 'text-green-600' : 'text-red-600'
-                    }`}>
+                    <span className={`font-bold flex-1 ${selectedStudent.todayStatus === 'Present' ? 'text-green-600' : 'text-red-600'
+                      }`}>
                       {selectedStudent.todayStatus || 'Absent'}
                     </span>
                   </div>
@@ -1135,44 +1136,44 @@ const AddStudentPage = () => {
         )}
       </AnimatePresence>
 
-        {openFaceScanner && newStudentId && (
-            <FaceRegistrationScanner
-              studentId={newStudentId}
-              token={token}
-              onClose={() => {
-                setOpenFaceScanner(false);
-                setNewStudentId(null);
-              }}
-            />
-        )}
+      {openFaceScanner && newStudentId && (
+        <FaceRegistrationScanner
+          studentId={newStudentId}
+          token={token}
+          onClose={() => {
+            setOpenFaceScanner(false);
+            setNewStudentId(null);
+          }}
+        />
+      )}
 
-        {showAttendance && attendanceStudent && (
-          <StudentAttendanceModal
-            student={attendanceStudent}
-            token={token}
-            onClose={() => {
-              setShowAttendance(false);
-              setAttendanceStudent(null);
-            }}
-          />
-        )}
+      {showAttendance && attendanceStudent && (
+        <StudentAttendanceModal
+          student={attendanceStudent}
+          token={token}
+          onClose={() => {
+            setShowAttendance(false);
+            setAttendanceStudent(null);
+          }}
+        />
+      )}
 
-        {openScanner && scanClassId && (
-          <ClassAttendanceScanner
-            classId={scanClassId}
-            onClose={async () => {
-              setOpenScanner(false);
-              setScanClassId(null);
+      {openScanner && scanClassId && (
+        <ClassAttendanceScanner
+          classId={scanClassId}
+          onClose={async () => {
+            setOpenScanner(false);
+            setScanClassId(null);
 
-              await fetchStudents(scanClassId);  
-            }}
-          />
-        )}
+            await fetchStudents(scanClassId);
+          }}
+        />
+      )}
 
 
     </div>
 
-    
+
   );
 };
 

@@ -161,7 +161,7 @@ const TeacherClasses = () => {
             >
               <p className="text-lg font-bold">
                 Class {cls.className}
-                </p>
+              </p>
 
               <p className="text-sm mt-1">
                 <strong>Section:</strong> {cls.section}
@@ -187,9 +187,8 @@ const TeacherClasses = () => {
           <button
             onClick={goPrev}
             disabled={page === 1}
-            className={`px-4 py-2 rounded-lg font-semibold ${
-              page === 1 ? "bg-gray-400/60 cursor-not-allowed" : "bg-white text-blue-700"
-            }`}
+            className={`px-4 py-2 rounded-lg font-semibold ${page === 1 ? "bg-gray-400/60 cursor-not-allowed" : "bg-white text-blue-700"
+              }`}
           >
             Prev
           </button>
@@ -199,11 +198,10 @@ const TeacherClasses = () => {
           <button
             onClick={goNext}
             disabled={page === totalPages}
-            className={`px-4 py-2 rounded-lg font-semibold ${
-              page === totalPages
+            className={`px-4 py-2 rounded-lg font-semibold ${page === totalPages
                 ? "bg-gray-400/60 cursor-not-allowed"
                 : "bg-white text-blue-700"
-            }`}
+              }`}
           >
             Next
           </button>

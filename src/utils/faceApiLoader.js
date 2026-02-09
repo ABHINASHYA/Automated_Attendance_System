@@ -2,6 +2,7 @@ import * as faceapi from "face-api.js";
 import * as tf from "@tensorflow/tfjs";
 import "@tensorflow/tfjs-backend-cpu"; // 👈 IMPORTANT
 
+
 let modelsLoaded = false;
 
 export const loadFaceApiModels = async () => {

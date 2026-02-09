@@ -1,48 +1,100 @@
 import Attendance from "../models/attendance.model.js";
 import { getTodayDate, isToday } from "../helpers/date.helper.js";
 
-export const markAttendance = async ({ studentId, classId, status, date }) => {
+/* ===============================
+   MARK / UPDATE (generic)
+================================ */
+export const markAttendance = async ({
+  studentId,
+  classId,
+  status,
+  date,
+  schoolId
+}) => {
+
   if (!isToday(date)) {
     throw new Error("Attendance can only be marked for today");
   }
 
-  // Upsert attendance for the specific student in the specific class on the given date
+  const day = new Date(date);
+  day.setHours(0, 0, 0, 0);
+
   return Attendance.findOneAndUpdate(
-    { studentId, classId, date },
-    { studentId, classId, status, date },
-    { upsert: true, new: true }
+    {
+      studentId,
+      classId,
+      schoolId,
+      date: day
+    },
+    {
+      $set: {
+        status
+      }
+    },
+    {
+      new: true,
+      upsert: true
+    }
   );
 };
 
-export const toggleAttendance = async (studentId, { classId, date }) => {
+
+
+/* ===============================
+   TOGGLE (manual button)
+================================ */
+export const toggleAttendance = async (
+  studentId,
+  { classId, date, schoolId }
+) => {
+
   if (!isToday(date)) {
     throw new Error("Cannot modify past attendance");
   }
 
-  const attendance = await Attendance.findOne({
+  const day = new Date(date);
+  day.setHours(0, 0, 0, 0);
+
+  const existing = await Attendance.findOne({
     studentId,
     classId,
-    date,
+    schoolId,
+    date: day
   });
 
-  if (!attendance) {
+  if (!existing) {
     return Attendance.create({
       studentId,
       classId,
-      date,
-      status: "Present",
+      schoolId,
+      date: day,
+      status: "Present"
     });
   }
 
-  attendance.status =
-    attendance.status === "Present" ? "Absent" : "Present";
+  existing.status =
+    existing.status === "Present" ? "Absent" : "Present";
 
-  return attendance.save();
+  return existing.save();
 };
 
-export const getAttendanceByClass = async (classId, date) => {
-  const today = date || getTodayDate();
 
-  return Attendance.find({ classId, date: today })
-    .populate("studentId", "name rollNo");
+
+/* ===============================
+   GET BY CLASS (today or date)
+================================ */
+export const getAttendanceByClass = async (
+  classId,
+  schoolId,
+  date
+) => {
+
+  const day = date ? new Date(date) : getTodayDate();
+  day.setHours(0, 0, 0, 0);
+
+  return Attendance.find({
+    classId,
+    schoolId,
+    date: day
+  }).populate("studentId", "name rollNo");
 };
